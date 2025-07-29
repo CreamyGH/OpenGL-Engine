@@ -31,10 +31,10 @@
 
 #include <limits.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include <string.h>
 #include <windowsx.h>
 #include <shellapi.h>
+#include <uxtheme.h>
 
 // Returns the window style for the specified window
 //
@@ -103,7 +103,7 @@ static HICON createIcon(const GLFWimage* image,
 {
     int i;
     HDC dc;
-    HICON Handle;
+    HICON handle;
     HBITMAP color, mask;
     BITMAPV5HEADER bi;
     ICONINFO ii;
@@ -164,12 +164,12 @@ static HICON createIcon(const GLFWimage* image,
     ii.hbmMask  = mask;
     ii.hbmColor = color;
 
-    Handle = CreateIconIndirect(&ii);
+    handle = CreateIconIndirect(&ii);
 
     DeleteObject(color);
     DeleteObject(mask);
 
-    if (!Handle)
+    if (!handle)
     {
         if (icon)
         {
@@ -183,7 +183,7 @@ static HICON createIcon(const GLFWimage* image,
         }
     }
 
-    return Handle;
+    return handle;
 }
 
 // Translate content area size to full window size according to styles and DPI
@@ -213,7 +213,7 @@ static void applyAspectRatio(_GLFWwindow* window, int edge, RECT* area)
     const float ratio = (float) window->numer / (float) window->denom;
 
     if (_glfwIsWindows10AnniversaryUpdateOrGreaterWin32())
-        dpi = GetDpiForWindow(window->win32.Handle);
+        dpi = GetDpiForWindow(window->win32.handle);
 
     getFullWindowSize(getWindowStyle(window), getWindowExStyle(window),
                       0, 0, &xoff, &yoff, dpi);
@@ -243,7 +243,7 @@ static void updateCursorImage(_GLFWwindow* window)
     if (window->cursorMode == GLFW_CURSOR_NORMAL)
     {
         if (window->cursor)
-            SetCursor(window->cursor->win32.Handle);
+            SetCursor(window->cursor->win32.handle);
         else
             SetCursor(LoadCursorW(NULL, IDC_ARROW));
     }
@@ -258,9 +258,9 @@ static void updateClipRect(_GLFWwindow* window)
     if (window)
     {
         RECT clipRect;
-        GetClientRect(window->win32.Handle, &clipRect);
-        ClientToScreen(window->win32.Handle, (POINT*) &clipRect.left);
-        ClientToScreen(window->win32.Handle, (POINT*) &clipRect.right);
+        GetClientRect(window->win32.handle, &clipRect);
+        ClientToScreen(window->win32.handle, (POINT*) &clipRect.left);
+        ClientToScreen(window->win32.handle, (POINT*) &clipRect.right);
         ClipCursor(&clipRect);
     }
     else
@@ -271,7 +271,7 @@ static void updateClipRect(_GLFWwindow* window)
 //
 static void enableRawMouseMotion(_GLFWwindow* window)
 {
-    const RAWINPUTDEVICE rid = { 0x01, 0x02, 0, window->win32.Handle };
+    const RAWINPUTDEVICE rid = { 0x01, 0x02, 0, window->win32.handle };
 
     if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
     {
@@ -298,9 +298,9 @@ static void disableRawMouseMotion(_GLFWwindow* window)
 static void disableCursor(_GLFWwindow* window)
 {
     _glfw.win32.disabledCursorWindow = window;
-    _glfwPlatformGetCursorPos(window,
-                              &_glfw.win32.restoreCursorPosX,
-                              &_glfw.win32.restoreCursorPosY);
+    _glfwGetCursorPosWin32(window,
+                           &_glfw.win32.restoreCursorPosX,
+                           &_glfw.win32.restoreCursorPosY);
     updateCursorImage(window);
     _glfwCenterCursorInContentArea(window);
     updateClipRect(window);
@@ -318,9 +318,9 @@ static void enableCursor(_GLFWwindow* window)
 
     _glfw.win32.disabledCursorWindow = NULL;
     updateClipRect(NULL);
-    _glfwPlatformSetCursorPos(window,
-                              _glfw.win32.restoreCursorPosX,
-                              _glfw.win32.restoreCursorPosY);
+    _glfwSetCursorPosWin32(window,
+                           _glfw.win32.restoreCursorPosX,
+                           _glfw.win32.restoreCursorPosY);
     updateCursorImage(window);
 }
 
@@ -334,12 +334,12 @@ static GLFWbool cursorInContentArea(_GLFWwindow* window)
     if (!GetCursorPos(&pos))
         return GLFW_FALSE;
 
-    if (WindowFromPoint(pos) != window->win32.Handle)
+    if (WindowFromPoint(pos) != window->win32.handle)
         return GLFW_FALSE;
 
-    GetClientRect(window->win32.Handle, &area);
-    ClientToScreen(window->win32.Handle, (POINT*) &area.left);
-    ClientToScreen(window->win32.Handle, (POINT*) &area.right);
+    GetClientRect(window->win32.handle, &area);
+    ClientToScreen(window->win32.handle, (POINT*) &area.left);
+    ClientToScreen(window->win32.handle, (POINT*) &area.right);
 
     return PtInRect(&area, pos);
 }
@@ -349,25 +349,25 @@ static GLFWbool cursorInContentArea(_GLFWwindow* window)
 static void updateWindowStyles(const _GLFWwindow* window)
 {
     RECT rect;
-    DWORD style = GetWindowLongW(window->win32.Handle, GWL_STYLE);
+    DWORD style = GetWindowLongW(window->win32.handle, GWL_STYLE);
     style &= ~(WS_OVERLAPPEDWINDOW | WS_POPUP);
     style |= getWindowStyle(window);
 
-    GetClientRect(window->win32.Handle, &rect);
+    GetClientRect(window->win32.handle, &rect);
 
     if (_glfwIsWindows10AnniversaryUpdateOrGreaterWin32())
     {
         AdjustWindowRectExForDpi(&rect, style, FALSE,
                                  getWindowExStyle(window),
-                                 GetDpiForWindow(window->win32.Handle));
+                                 GetDpiForWindow(window->win32.handle));
     }
     else
         AdjustWindowRectEx(&rect, style, FALSE, getWindowExStyle(window));
 
-    ClientToScreen(window->win32.Handle, (POINT*) &rect.left);
-    ClientToScreen(window->win32.Handle, (POINT*) &rect.right);
-    SetWindowLongW(window->win32.Handle, GWL_STYLE, style);
-    SetWindowPos(window->win32.Handle, HWND_TOP,
+    ClientToScreen(window->win32.handle, (POINT*) &rect.left);
+    ClientToScreen(window->win32.handle, (POINT*) &rect.right);
+    SetWindowLongW(window->win32.handle, GWL_STYLE, style);
+    SetWindowPos(window->win32.handle, HWND_TOP,
                  rect.left, rect.top,
                  rect.right - rect.left, rect.bottom - rect.top,
                  SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOZORDER);
@@ -395,7 +395,7 @@ static void updateFramebufferTransparency(const _GLFWwindow* window)
         bb.hRgnBlur = region;
         bb.fEnable = TRUE;
 
-        DwmEnableBlurBehindWindow(window->win32.Handle, &bb);
+        DwmEnableBlurBehindWindow(window->win32.handle, &bb);
         DeleteObject(region);
     }
     else
@@ -406,7 +406,7 @@ static void updateFramebufferTransparency(const _GLFWwindow* window)
         //       of replacing it
         DWM_BLURBEHIND bb = {0};
         bb.dwFlags = DWM_BB_ENABLE;
-        DwmEnableBlurBehindWindow(window->win32.Handle, &bb);
+        DwmEnableBlurBehindWindow(window->win32.handle, &bb);
     }
 }
 
@@ -435,8 +435,8 @@ static int getKeyMods(void)
 static void fitToMonitor(_GLFWwindow* window)
 {
     MONITORINFO mi = { sizeof(mi) };
-    GetMonitorInfo(window->monitor->win32.Handle, &mi);
-    SetWindowPos(window->win32.Handle, HWND_TOPMOST,
+    GetMonitorInfo(window->monitor->win32.handle, &mi);
+    SetWindowPos(window->win32.handle, HWND_TOPMOST,
                  mi.rcMonitor.left,
                  mi.rcMonitor.top,
                  mi.rcMonitor.right - mi.rcMonitor.left,
@@ -490,6 +490,9 @@ static void releaseMonitor(_GLFWwindow* window)
 static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                                    WPARAM wParam, LPARAM lParam)
 {
+	static RECT border_thickness = { 4, 4, 4, 4 };
+	BOOL hasThickFrame = GetWindowLongPtr(hWnd, GWL_STYLE) & WS_THICKFRAME;
+
     _GLFWwindow* window = GetPropW(hWnd, L"GLFW");
     if (!window)
     {
@@ -538,6 +541,40 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                         _glfwDetectJoystickDisconnectionWin32();
                 }
 
+                break;
+            }
+
+            case WM_CREATE:
+            {
+                if (_glfw.hints.window.titlebar)
+                    break;
+
+                if (hasThickFrame)
+                {
+                    RECT size_rect;
+                    GetWindowRect(hWnd, &size_rect);
+
+                    // Inform the application of the frame change to force redrawing with the new
+                    // client area that is extended into the title bar
+                    SetWindowPos(
+                        hWnd, NULL,
+                        size_rect.left, size_rect.top,
+                        size_rect.right - size_rect.left, size_rect.bottom - size_rect.top,
+                        SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE
+                    );
+                    break;
+                }
+
+                break;
+            }
+
+            case WM_ACTIVATE:
+            {
+                if (_glfw.hints.window.titlebar)
+                    break;
+
+				RECT title_bar_rect = {0};
+				InvalidateRect(hWnd, &title_bar_rect, FALSE);
                 break;
             }
         }
@@ -596,7 +633,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                 enableCursor(window);
 
             if (window->monitor && window->autoIconify)
-                _glfwPlatformIconifyWindow(window);
+                _glfwIconifyWindowWin32(window);
 
             _glfwInputWindowFocus(window, GLFW_FALSE);
             return 0;
@@ -650,7 +687,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                 window->win32.highSurrogate = (WCHAR) wParam;
             else
             {
-                unsigned int codepoint = 0;
+                uint32_t codepoint = 0;
 
                 if (wParam >= 0xdc00 && wParam <= 0xdfff)
                 {
@@ -684,7 +721,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                 return TRUE;
             }
 
-            _glfwInputChar(window, (unsigned int) wParam, getKeyMods(), GLFW_TRUE);
+            _glfwInputChar(window, (uint32_t) wParam, getKeyMods(), GLFW_TRUE);
             return 0;
         }
 
@@ -756,7 +793,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             {
                 // HACK: Release both Shift keys on Shift up event, as when both
                 //       are pressed the first release does not emit any event
-                // NOTE: The other half of this is in _glfwPlatformPollEvents
+                // NOTE: The other half of this is in _glfwPollEventsWin32
                 _glfwInputKey(window, GLFW_KEY_LEFT_SHIFT, scancode, action, mods);
                 _glfwInputKey(window, GLFW_KEY_RIGHT_SHIFT, scancode, action, mods);
             }
@@ -839,7 +876,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                 ZeroMemory(&tme, sizeof(tme));
                 tme.cbSize = sizeof(tme);
                 tme.dwFlags = TME_LEAVE;
-                tme.hwndTrack = window->win32.Handle;
+                tme.hwndTrack = window->win32.handle;
                 TrackMouseEvent(&tme);
 
                 window->win32.cursorTracked = GLFW_TRUE;
@@ -884,8 +921,8 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             GetRawInputData(ri, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
             if (size > (UINT) _glfw.win32.rawInputSize)
             {
-                free(_glfw.win32.rawInput);
-                _glfw.win32.rawInput = calloc(size, 1);
+                _glfw_free(_glfw.win32.rawInput);
+                _glfw.win32.rawInput = _glfw_calloc(size, 1);
                 _glfw.win32.rawInputSize = size;
             }
 
@@ -969,6 +1006,48 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             break;
         }
 
+		case WM_NCCALCSIZE:
+		{
+			if (_glfw.hints.window.titlebar || !hasThickFrame || !wParam)
+				break;
+
+            // For custom frames
+
+            // Shrink client area by border thickness so we can
+            // resize window and see borders
+			const int resizeBorderX = GetSystemMetrics(SM_CXFRAME);
+			const int resizeBorderY = GetSystemMetrics(SM_CYFRAME);
+
+			NCCALCSIZE_PARAMS* params = (NCCALCSIZE_PARAMS*)lParam;
+			RECT* requestedClientRect = params->rgrc;
+
+			requestedClientRect->right -= resizeBorderX;
+			requestedClientRect->left += resizeBorderX;
+			requestedClientRect->bottom -= resizeBorderY;
+
+            //
+            // NOTE(Yan):
+            // 
+            // Top borders seem to be handled differently.
+            // 
+            // Contracting by 1 on Win 11 seems to give a small area
+            // for resizing whilst not showing a white border.
+            // 
+			// But this doesn't seem to work on Win 10, instead showing
+			// a general white titlebar on top of the custom one...
+			// to be continued.
+            // 
+            // Not changing the top (i.e. 0) means we don't see the
+            // mouse icon change to a resize handle, but resizing still
+            // works once you click and drag. This works on both
+            // Windows 10 & 11, so we'll keep that for now.
+			requestedClientRect->top += 0; 
+
+            // NOTE(Yan): seems to make no difference what we return here,
+            //            was originally 0
+			return WVR_ALIGNTOP | WVR_ALIGNLEFT;
+		}
+
         case WM_SIZE:
         {
             const int width = LOWORD(lParam);
@@ -1009,6 +1088,18 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
             window->win32.iconified = iconified;
             window->win32.maximized = maximized;
+
+			RECT size_rect;
+			GetWindowRect(hWnd, &size_rect);
+
+			// Inform the application of the frame change to force redrawing with the new
+			// client area that is extended into the title bar
+			SetWindowPos(
+				hWnd, NULL,
+				size_rect.left, size_rect.top,
+				size_rect.right - size_rect.left, size_rect.bottom - size_rect.top,
+				SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE
+			);
             return 0;
         }
 
@@ -1047,7 +1138,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                 break;
 
             if (_glfwIsWindows10AnniversaryUpdateOrGreaterWin32())
-                dpi = GetDpiForWindow(window->win32.Handle);
+                dpi = GetDpiForWindow(window->win32.handle);
 
             getFullWindowSize(getWindowStyle(window), getWindowExStyle(window),
                               0, 0, &xoff, &yoff, dpi);
@@ -1069,7 +1160,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             if (!window->decorated)
             {
                 MONITORINFO mi;
-                const HMONITOR mh = MonitorFromWindow(window->win32.Handle,
+                const HMONITOR mh = MonitorFromWindow(window->win32.handle,
                                                       MONITOR_DEFAULTTONEAREST);
 
                 ZeroMemory(&mi, sizeof(mi));
@@ -1128,7 +1219,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
                 AdjustWindowRectExForDpi(&source, getWindowStyle(window),
                                          FALSE, getWindowExStyle(window),
-                                         GetDpiForWindow(window->win32.Handle));
+                                         GetDpiForWindow(window->win32.handle));
                 AdjustWindowRectExForDpi(&target, getWindowStyle(window),
                                          FALSE, getWindowExStyle(window),
                                          LOWORD(wParam));
@@ -1155,7 +1246,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                  _glfwIsWindows10CreatorsUpdateOrGreaterWin32()))
             {
                 RECT* suggested = (RECT*) lParam;
-                SetWindowPos(window->win32.Handle, HWND_TOP,
+                SetWindowPos(window->win32.handle, HWND_TOP,
                              suggested->left,
                              suggested->top,
                              suggested->right - suggested->left,
@@ -1185,7 +1276,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             int i;
 
             const int count = DragQueryFileW(drop, 0xffffffff, NULL, 0);
-            char** paths = calloc(count, sizeof(char*));
+            char** paths = _glfw_calloc(count, sizeof(char*));
 
             // Move the mouse to the position of the drop
             DragQueryPoint(drop, &pt);
@@ -1194,22 +1285,80 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             for (i = 0;  i < count;  i++)
             {
                 const UINT length = DragQueryFileW(drop, i, NULL, 0);
-                WCHAR* buffer = calloc((size_t) length + 1, sizeof(WCHAR));
+                WCHAR* buffer = _glfw_calloc((size_t) length + 1, sizeof(WCHAR));
 
                 DragQueryFileW(drop, i, buffer, length + 1);
                 paths[i] = _glfwCreateUTF8FromWideStringWin32(buffer);
 
-                free(buffer);
+                _glfw_free(buffer);
             }
 
             _glfwInputDrop(window, count, (const char**) paths);
 
             for (i = 0;  i < count;  i++)
-                free(paths[i]);
-            free(paths);
+                _glfw_free(paths[i]);
+            _glfw_free(paths);
 
             DragFinish(drop);
             return 0;
+        }
+
+        case WM_ACTIVATE:
+        {
+            if (_glfw.hints.window.titlebar)
+                break;
+
+			RECT title_bar_rect = { 0 };
+			InvalidateRect(hWnd, &title_bar_rect, FALSE);
+        }
+        case WM_NCHITTEST:
+        {
+            if (_glfw.hints.window.titlebar || !hasThickFrame)
+                break;
+
+            //
+            // Hit test for custom frames
+            //
+			POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+			ScreenToClient(hWnd, &pt);
+
+            // Check borders first
+			if (!window->win32.maximized)
+			{
+				RECT rc;
+				GetClientRect(hWnd, &rc);
+
+				const int verticalBorderSize = GetSystemMetrics(SM_CYFRAME);
+
+				enum { left = 1, top = 2, right = 4, bottom = 8 };
+				int hit = 0;
+				if (pt.x <= border_thickness.left)
+                    hit |= left;
+				if (pt.x >= rc.right - border_thickness.right)
+                    hit |= right;
+				if (pt.y <= border_thickness.top || pt.y < verticalBorderSize)
+                    hit |= top;
+				if (pt.y >= rc.bottom - border_thickness.bottom)
+                    hit |= bottom;
+
+				if (hit & top && hit & left)        return HTTOPLEFT;
+				if (hit & top && hit & right)       return HTTOPRIGHT;
+				if (hit & bottom && hit & left)     return HTBOTTOMLEFT;
+				if (hit & bottom && hit & right)    return HTBOTTOMRIGHT;
+				if (hit & left)                     return HTLEFT;
+                if (hit & top)                      return HTTOP;
+				if (hit & right)                    return HTRIGHT;
+				if (hit & bottom)                   return HTBOTTOM;
+			}
+
+            // Then do client-side test which should determine titlebar bounds
+			int titlebarHittest = 0;
+			_glfwInputTitleBarHitTest(window, pt.x, pt.y, &titlebarHittest);
+			if (titlebarHittest)
+				return HTCAPTION;
+
+            // In client area
+			return HTCLIENT;
         }
     }
 
@@ -1234,8 +1383,8 @@ static int createNativeWindow(_GLFWwindow* window,
         // NOTE: This window placement is temporary and approximate, as the
         //       correct position and size cannot be known until the monitor
         //       video mode has been picked in _glfwSetVideoModeWin32
-        _glfwPlatformGetMonitorPos(window->monitor, &xpos, &ypos);
-        _glfwPlatformGetVideoMode(window->monitor, &mode);
+        _glfwGetMonitorPosWin32(window->monitor, &xpos, &ypos);
+        _glfwGetVideoModeWin32(window->monitor, &mode);
         fullWidth  = mode.width;
         fullHeight = mode.height;
     }
@@ -1258,7 +1407,7 @@ static int createNativeWindow(_GLFWwindow* window,
     if (!wideTitle)
         return GLFW_FALSE;
 
-    window->win32.Handle = CreateWindowExW(exStyle,
+    window->win32.handle = CreateWindowExW(exStyle,
                                            _GLFW_WNDCLASSNAME,
                                            wideTitle,
                                            style,
@@ -1269,24 +1418,24 @@ static int createNativeWindow(_GLFWwindow* window,
                                            GetModuleHandleW(NULL),
                                            (LPVOID) wndconfig);
 
-    free(wideTitle);
+    _glfw_free(wideTitle);
 
-    if (!window->win32.Handle)
+    if (!window->win32.handle)
     {
         _glfwInputErrorWin32(GLFW_PLATFORM_ERROR,
                              "Win32: Failed to create window");
         return GLFW_FALSE;
     }
 
-    SetPropW(window->win32.Handle, L"GLFW", window);
+    SetPropW(window->win32.handle, L"GLFW", window);
 
     if (IsWindows7OrGreater())
     {
-        ChangeWindowMessageFilterEx(window->win32.Handle,
+        ChangeWindowMessageFilterEx(window->win32.handle,
                                     WM_DROPFILES, MSGFLT_ALLOW, NULL);
-        ChangeWindowMessageFilterEx(window->win32.Handle,
+        ChangeWindowMessageFilterEx(window->win32.handle,
                                     WM_COPYDATA, MSGFLT_ALLOW, NULL);
-        ChangeWindowMessageFilterEx(window->win32.Handle,
+        ChangeWindowMessageFilterEx(window->win32.handle,
                                     WM_COPYGLOBALDATA, MSGFLT_ALLOW, NULL);
     }
 
@@ -1304,30 +1453,34 @@ static int createNativeWindow(_GLFWwindow* window,
         if (wndconfig->scaleToMonitor)
         {
             float xscale, yscale;
-            _glfwPlatformGetWindowContentScale(window, &xscale, &yscale);
-            rect.right = (int) (rect.right * xscale);
-            rect.bottom = (int) (rect.bottom * yscale);
+            _glfwGetWindowContentScaleWin32(window, &xscale, &yscale);
+
+            if (xscale > 0.f && yscale > 0.f)
+            {
+                rect.right = (int) (rect.right * xscale);
+                rect.bottom = (int) (rect.bottom * yscale);
+            }
         }
 
-        ClientToScreen(window->win32.Handle, (POINT*) &rect.left);
-        ClientToScreen(window->win32.Handle, (POINT*) &rect.right);
+        ClientToScreen(window->win32.handle, (POINT*) &rect.left);
+        ClientToScreen(window->win32.handle, (POINT*) &rect.right);
 
         if (_glfwIsWindows10AnniversaryUpdateOrGreaterWin32())
         {
             AdjustWindowRectExForDpi(&rect, style, FALSE, exStyle,
-                                     GetDpiForWindow(window->win32.Handle));
+                                     GetDpiForWindow(window->win32.handle));
         }
         else
             AdjustWindowRectEx(&rect, style, FALSE, exStyle);
 
         // Only update the restored window rect as the window may be maximized
-        GetWindowPlacement(window->win32.Handle, &wp);
+        GetWindowPlacement(window->win32.handle, &wp);
         wp.rcNormalPosition = rect;
         wp.showCmd = SW_HIDE;
-        SetWindowPlacement(window->win32.Handle, &wp);
+        SetWindowPlacement(window->win32.handle, &wp);
     }
 
-    DragAcceptFiles(window->win32.Handle, TRUE);
+    DragAcceptFiles(window->win32.handle, TRUE);
 
     if (fbconfig->transparent)
     {
@@ -1335,15 +1488,10 @@ static int createNativeWindow(_GLFWwindow* window,
         window->win32.transparent = GLFW_TRUE;
     }
 
-    _glfwPlatformGetWindowSize(window, &window->win32.width, &window->win32.height);
+    _glfwGetWindowSizeWin32(window, &window->win32.width, &window->win32.height);
 
     return GLFW_TRUE;
 }
-
-
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
 
 // Registers the GLFW window class
 //
@@ -1388,15 +1536,10 @@ void _glfwUnregisterWindowClassWin32(void)
     UnregisterClassW(_GLFW_WNDCLASSNAME, GetModuleHandleW(NULL));
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW platform API                      //////
-//////////////////////////////////////////////////////////////////////////
-
-int _glfwPlatformCreateWindow(_GLFWwindow* window,
-                              const _GLFWwndconfig* wndconfig,
-                              const _GLFWctxconfig* ctxconfig,
-                              const _GLFWfbconfig* fbconfig)
+int _glfwCreateWindowWin32(_GLFWwindow* window,
+                           const _GLFWwndconfig* wndconfig,
+                           const _GLFWctxconfig* ctxconfig,
+                           const _GLFWfbconfig* fbconfig)
 {
     if (!createNativeWindow(window, wndconfig, fbconfig))
         return GLFW_FALSE;
@@ -1428,8 +1571,8 @@ int _glfwPlatformCreateWindow(_GLFWwindow* window,
 
     if (window->monitor)
     {
-        _glfwPlatformShowWindow(window);
-        _glfwPlatformFocusWindow(window);
+        _glfwShowWindowWin32(window);
+        _glfwFocusWindowWin32(window);
         acquireMonitor(window);
         fitToMonitor(window);
     }
@@ -1437,7 +1580,7 @@ int _glfwPlatformCreateWindow(_GLFWwindow* window,
     return GLFW_TRUE;
 }
 
-void _glfwPlatformDestroyWindow(_GLFWwindow* window)
+void _glfwDestroyWindowWin32(_GLFWwindow* window)
 {
     if (window->monitor)
         releaseMonitor(window);
@@ -1448,11 +1591,11 @@ void _glfwPlatformDestroyWindow(_GLFWwindow* window)
     if (_glfw.win32.disabledCursorWindow == window)
         _glfw.win32.disabledCursorWindow = NULL;
 
-    if (window->win32.Handle)
+    if (window->win32.handle)
     {
-        RemovePropW(window->win32.Handle, L"GLFW");
-        DestroyWindow(window->win32.Handle);
-        window->win32.Handle = NULL;
+        RemovePropW(window->win32.handle, L"GLFW");
+        DestroyWindow(window->win32.handle);
+        window->win32.handle = NULL;
     }
 
     if (window->win32.bigIcon)
@@ -1462,18 +1605,18 @@ void _glfwPlatformDestroyWindow(_GLFWwindow* window)
         DestroyIcon(window->win32.smallIcon);
 }
 
-void _glfwPlatformSetWindowTitle(_GLFWwindow* window, const char* title)
+void _glfwSetWindowTitleWin32(_GLFWwindow* window, const char* title)
 {
     WCHAR* wideTitle = _glfwCreateWideStringFromUTF8Win32(title);
     if (!wideTitle)
         return;
 
-    SetWindowTextW(window->win32.Handle, wideTitle);
-    free(wideTitle);
+    SetWindowTextW(window->win32.handle, wideTitle);
+    _glfw_free(wideTitle);
 }
 
-void _glfwPlatformSetWindowIcon(_GLFWwindow* window,
-                                int count, const GLFWimage* images)
+void _glfwSetWindowIconWin32(_GLFWwindow* window,
+                             int count, const GLFWimage* images)
 {
     HICON bigIcon = NULL, smallIcon = NULL;
 
@@ -1491,12 +1634,12 @@ void _glfwPlatformSetWindowIcon(_GLFWwindow* window,
     }
     else
     {
-        bigIcon = (HICON) GetClassLongPtrW(window->win32.Handle, GCLP_HICON);
-        smallIcon = (HICON) GetClassLongPtrW(window->win32.Handle, GCLP_HICONSM);
+        bigIcon = (HICON) GetClassLongPtrW(window->win32.handle, GCLP_HICON);
+        smallIcon = (HICON) GetClassLongPtrW(window->win32.handle, GCLP_HICONSM);
     }
 
-    SendMessage(window->win32.Handle, WM_SETICON, ICON_BIG, (LPARAM) bigIcon);
-    SendMessage(window->win32.Handle, WM_SETICON, ICON_SMALL, (LPARAM) smallIcon);
+    SendMessage(window->win32.handle, WM_SETICON, ICON_BIG, (LPARAM) bigIcon);
+    SendMessage(window->win32.handle, WM_SETICON, ICON_SMALL, (LPARAM) smallIcon);
 
     if (window->win32.bigIcon)
         DestroyIcon(window->win32.bigIcon);
@@ -1511,10 +1654,10 @@ void _glfwPlatformSetWindowIcon(_GLFWwindow* window,
     }
 }
 
-void _glfwPlatformGetWindowPos(_GLFWwindow* window, int* xpos, int* ypos)
+void _glfwGetWindowPosWin32(_GLFWwindow* window, int* xpos, int* ypos)
 {
     POINT pos = { 0, 0 };
-    ClientToScreen(window->win32.Handle, &pos);
+    ClientToScreen(window->win32.handle, &pos);
 
     if (xpos)
         *xpos = pos.x;
@@ -1522,7 +1665,7 @@ void _glfwPlatformGetWindowPos(_GLFWwindow* window, int* xpos, int* ypos)
         *ypos = pos.y;
 }
 
-void _glfwPlatformSetWindowPos(_GLFWwindow* window, int xpos, int ypos)
+void _glfwSetWindowPosWin32(_GLFWwindow* window, int xpos, int ypos)
 {
     RECT rect = { xpos, ypos, xpos, ypos };
 
@@ -1530,7 +1673,7 @@ void _glfwPlatformSetWindowPos(_GLFWwindow* window, int xpos, int ypos)
     {
         AdjustWindowRectExForDpi(&rect, getWindowStyle(window),
                                  FALSE, getWindowExStyle(window),
-                                 GetDpiForWindow(window->win32.Handle));
+                                 GetDpiForWindow(window->win32.handle));
     }
     else
     {
@@ -1538,14 +1681,14 @@ void _glfwPlatformSetWindowPos(_GLFWwindow* window, int xpos, int ypos)
                            FALSE, getWindowExStyle(window));
     }
 
-    SetWindowPos(window->win32.Handle, NULL, rect.left, rect.top, 0, 0,
+    SetWindowPos(window->win32.handle, NULL, rect.left, rect.top, 0, 0,
                  SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOSIZE);
 }
 
-void _glfwPlatformGetWindowSize(_GLFWwindow* window, int* width, int* height)
+void _glfwGetWindowSizeWin32(_GLFWwindow* window, int* width, int* height)
 {
     RECT area;
-    GetClientRect(window->win32.Handle, &area);
+    GetClientRect(window->win32.handle, &area);
 
     if (width)
         *width = area.right;
@@ -1553,7 +1696,7 @@ void _glfwPlatformGetWindowSize(_GLFWwindow* window, int* width, int* height)
         *height = area.bottom;
 }
 
-void _glfwPlatformSetWindowSize(_GLFWwindow* window, int width, int height)
+void _glfwSetWindowSizeWin32(_GLFWwindow* window, int width, int height)
 {
     if (window->monitor)
     {
@@ -1571,7 +1714,7 @@ void _glfwPlatformSetWindowSize(_GLFWwindow* window, int width, int height)
         {
             AdjustWindowRectExForDpi(&rect, getWindowStyle(window),
                                      FALSE, getWindowExStyle(window),
-                                     GetDpiForWindow(window->win32.Handle));
+                                     GetDpiForWindow(window->win32.handle));
         }
         else
         {
@@ -1579,15 +1722,15 @@ void _glfwPlatformSetWindowSize(_GLFWwindow* window, int width, int height)
                                FALSE, getWindowExStyle(window));
         }
 
-        SetWindowPos(window->win32.Handle, HWND_TOP,
+        SetWindowPos(window->win32.handle, HWND_TOP,
                      0, 0, rect.right - rect.left, rect.bottom - rect.top,
                      SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOMOVE | SWP_NOZORDER);
     }
 }
 
-void _glfwPlatformSetWindowSizeLimits(_GLFWwindow* window,
-                                      int minwidth, int minheight,
-                                      int maxwidth, int maxheight)
+void _glfwSetWindowSizeLimitsWin32(_GLFWwindow* window,
+                                           int minwidth, int minheight,
+                                           int maxwidth, int maxheight)
 {
     RECT area;
 
@@ -1597,48 +1740,48 @@ void _glfwPlatformSetWindowSizeLimits(_GLFWwindow* window,
         return;
     }
 
-    GetWindowRect(window->win32.Handle, &area);
-    MoveWindow(window->win32.Handle,
+    GetWindowRect(window->win32.handle, &area);
+    MoveWindow(window->win32.handle,
                area.left, area.top,
                area.right - area.left,
                area.bottom - area.top, TRUE);
 }
 
-void _glfwPlatformSetWindowAspectRatio(_GLFWwindow* window, int numer, int denom)
+void _glfwSetWindowAspectRatioWin32(_GLFWwindow* window, int numer, int denom)
 {
     RECT area;
 
     if (numer == GLFW_DONT_CARE || denom == GLFW_DONT_CARE)
         return;
 
-    GetWindowRect(window->win32.Handle, &area);
+    GetWindowRect(window->win32.handle, &area);
     applyAspectRatio(window, WMSZ_BOTTOMRIGHT, &area);
-    MoveWindow(window->win32.Handle,
+    MoveWindow(window->win32.handle,
                area.left, area.top,
                area.right - area.left,
                area.bottom - area.top, TRUE);
 }
 
-void _glfwPlatformGetFramebufferSize(_GLFWwindow* window, int* width, int* height)
+void _glfwGetFramebufferSizeWin32(_GLFWwindow* window, int* width, int* height)
 {
-    _glfwPlatformGetWindowSize(window, width, height);
+    _glfwGetWindowSizeWin32(window, width, height);
 }
 
-void _glfwPlatformGetWindowFrameSize(_GLFWwindow* window,
-                                     int* left, int* top,
-                                     int* right, int* bottom)
+void _glfwGetWindowFrameSizeWin32(_GLFWwindow* window,
+                                          int* left, int* top,
+                                          int* right, int* bottom)
 {
     RECT rect;
     int width, height;
 
-    _glfwPlatformGetWindowSize(window, &width, &height);
+    _glfwGetWindowSizeWin32(window, &width, &height);
     SetRect(&rect, 0, 0, width, height);
 
     if (_glfwIsWindows10AnniversaryUpdateOrGreaterWin32())
     {
         AdjustWindowRectExForDpi(&rect, getWindowStyle(window),
                                  FALSE, getWindowExStyle(window),
-                                 GetDpiForWindow(window->win32.Handle));
+                                 GetDpiForWindow(window->win32.handle));
     }
     else
     {
@@ -1656,56 +1799,55 @@ void _glfwPlatformGetWindowFrameSize(_GLFWwindow* window,
         *bottom = rect.bottom - height;
 }
 
-void _glfwPlatformGetWindowContentScale(_GLFWwindow* window,
-                                        float* xscale, float* yscale)
+void _glfwGetWindowContentScaleWin32(_GLFWwindow* window, float* xscale, float* yscale)
 {
-    const HANDLE Handle = MonitorFromWindow(window->win32.Handle,
+    const HANDLE handle = MonitorFromWindow(window->win32.handle,
                                             MONITOR_DEFAULTTONEAREST);
-    _glfwGetMonitorContentScaleWin32(Handle, xscale, yscale);
+    _glfwGetHMONITORContentScaleWin32(handle, xscale, yscale);
 }
 
-void _glfwPlatformIconifyWindow(_GLFWwindow* window)
+void _glfwIconifyWindowWin32(_GLFWwindow* window)
 {
-    ShowWindow(window->win32.Handle, SW_MINIMIZE);
+    ShowWindow(window->win32.handle, SW_MINIMIZE);
 }
 
-void _glfwPlatformRestoreWindow(_GLFWwindow* window)
+void _glfwRestoreWindowWin32(_GLFWwindow* window)
 {
-    ShowWindow(window->win32.Handle, SW_RESTORE);
+    ShowWindow(window->win32.handle, SW_RESTORE);
 }
 
-void _glfwPlatformMaximizeWindow(_GLFWwindow* window)
+void _glfwMaximizeWindowWin32(_GLFWwindow* window)
 {
-    ShowWindow(window->win32.Handle, SW_MAXIMIZE);
+    ShowWindow(window->win32.handle, SW_MAXIMIZE);
 }
 
-void _glfwPlatformShowWindow(_GLFWwindow* window)
+void _glfwShowWindowWin32(_GLFWwindow* window)
 {
-    ShowWindow(window->win32.Handle, SW_SHOWNA);
+    ShowWindow(window->win32.handle, SW_SHOWNA);
 }
 
-void _glfwPlatformHideWindow(_GLFWwindow* window)
+void _glfwHideWindowWin32(_GLFWwindow* window)
 {
-    ShowWindow(window->win32.Handle, SW_HIDE);
+    ShowWindow(window->win32.handle, SW_HIDE);
 }
 
-void _glfwPlatformRequestWindowAttention(_GLFWwindow* window)
+void _glfwRequestWindowAttentionWin32(_GLFWwindow* window)
 {
-    FlashWindow(window->win32.Handle, TRUE);
+    FlashWindow(window->win32.handle, TRUE);
 }
 
-void _glfwPlatformFocusWindow(_GLFWwindow* window)
+void _glfwFocusWindowWin32(_GLFWwindow* window)
 {
-    BringWindowToTop(window->win32.Handle);
-    SetForegroundWindow(window->win32.Handle);
-    SetFocus(window->win32.Handle);
+    BringWindowToTop(window->win32.handle);
+    SetForegroundWindow(window->win32.handle);
+    SetFocus(window->win32.handle);
 }
 
-void _glfwPlatformSetWindowMonitor(_GLFWwindow* window,
-                                   _GLFWmonitor* monitor,
-                                   int xpos, int ypos,
-                                   int width, int height,
-                                   int refreshRate)
+void _glfwSetWindowMonitorWin32(_GLFWwindow* window,
+                                _GLFWmonitor* monitor,
+                                int xpos, int ypos,
+                                int width, int height,
+                                int refreshRate)
 {
     if (window->monitor == monitor)
     {
@@ -1725,7 +1867,7 @@ void _glfwPlatformSetWindowMonitor(_GLFWwindow* window,
             {
                 AdjustWindowRectExForDpi(&rect, getWindowStyle(window),
                                          FALSE, getWindowExStyle(window),
-                                         GetDpiForWindow(window->win32.Handle));
+                                         GetDpiForWindow(window->win32.handle));
             }
             else
             {
@@ -1733,7 +1875,7 @@ void _glfwPlatformSetWindowMonitor(_GLFWwindow* window,
                                    FALSE, getWindowExStyle(window));
             }
 
-            SetWindowPos(window->win32.Handle, HWND_TOP,
+            SetWindowPos(window->win32.handle, HWND_TOP,
                          rect.left, rect.top,
                          rect.right - rect.left, rect.bottom - rect.top,
                          SWP_NOCOPYBITS | SWP_NOACTIVATE | SWP_NOZORDER);
@@ -1754,17 +1896,17 @@ void _glfwPlatformSetWindowMonitor(_GLFWwindow* window,
 
         if (window->decorated)
         {
-            DWORD style = GetWindowLongW(window->win32.Handle, GWL_STYLE);
+            DWORD style = GetWindowLongW(window->win32.handle, GWL_STYLE);
             style &= ~WS_OVERLAPPEDWINDOW;
             style |= getWindowStyle(window);
-            SetWindowLongW(window->win32.Handle, GWL_STYLE, style);
+            SetWindowLongW(window->win32.handle, GWL_STYLE, style);
             flags |= SWP_FRAMECHANGED;
         }
 
         acquireMonitor(window);
 
-        GetMonitorInfo(window->monitor->win32.Handle, &mi);
-        SetWindowPos(window->win32.Handle, HWND_TOPMOST,
+        GetMonitorInfo(window->monitor->win32.handle, &mi);
+        SetWindowPos(window->win32.handle, HWND_TOPMOST,
                      mi.rcMonitor.left,
                      mi.rcMonitor.top,
                      mi.rcMonitor.right - mi.rcMonitor.left,
@@ -1775,14 +1917,14 @@ void _glfwPlatformSetWindowMonitor(_GLFWwindow* window,
     {
         HWND after;
         RECT rect = { xpos, ypos, xpos + width, ypos + height };
-        DWORD style = GetWindowLongW(window->win32.Handle, GWL_STYLE);
+        DWORD style = GetWindowLongW(window->win32.handle, GWL_STYLE);
         UINT flags = SWP_NOACTIVATE | SWP_NOCOPYBITS;
 
         if (window->decorated)
         {
             style &= ~WS_POPUP;
             style |= getWindowStyle(window);
-            SetWindowLongW(window->win32.Handle, GWL_STYLE, style);
+            SetWindowLongW(window->win32.handle, GWL_STYLE, style);
 
             flags |= SWP_FRAMECHANGED;
         }
@@ -1796,7 +1938,7 @@ void _glfwPlatformSetWindowMonitor(_GLFWwindow* window,
         {
             AdjustWindowRectExForDpi(&rect, getWindowStyle(window),
                                      FALSE, getWindowExStyle(window),
-                                     GetDpiForWindow(window->win32.Handle));
+                                     GetDpiForWindow(window->win32.handle));
         }
         else
         {
@@ -1804,39 +1946,39 @@ void _glfwPlatformSetWindowMonitor(_GLFWwindow* window,
                                FALSE, getWindowExStyle(window));
         }
 
-        SetWindowPos(window->win32.Handle, after,
+        SetWindowPos(window->win32.handle, after,
                      rect.left, rect.top,
                      rect.right - rect.left, rect.bottom - rect.top,
                      flags);
     }
 }
 
-int _glfwPlatformWindowFocused(_GLFWwindow* window)
+int _glfwWindowFocusedWin32(_GLFWwindow* window)
 {
-    return window->win32.Handle == GetActiveWindow();
+    return window->win32.handle == GetActiveWindow();
 }
 
-int _glfwPlatformWindowIconified(_GLFWwindow* window)
+int _glfwWindowIconifiedWin32(_GLFWwindow* window)
 {
-    return IsIconic(window->win32.Handle);
+    return IsIconic(window->win32.handle);
 }
 
-int _glfwPlatformWindowVisible(_GLFWwindow* window)
+int _glfwWindowVisibleWin32(_GLFWwindow* window)
 {
-    return IsWindowVisible(window->win32.Handle);
+    return IsWindowVisible(window->win32.handle);
 }
 
-int _glfwPlatformWindowMaximized(_GLFWwindow* window)
+int _glfwWindowMaximizedWin32(_GLFWwindow* window)
 {
-    return IsZoomed(window->win32.Handle);
+    return IsZoomed(window->win32.handle);
 }
 
-int _glfwPlatformWindowHovered(_GLFWwindow* window)
+int _glfwWindowHoveredWin32(_GLFWwindow* window)
 {
     return cursorInContentArea(window);
 }
 
-int _glfwPlatformFramebufferTransparent(_GLFWwindow* window)
+int _glfwFramebufferTransparentWin32(_GLFWwindow* window)
 {
     BOOL composition, opaque;
     DWORD color;
@@ -1863,32 +2005,37 @@ int _glfwPlatformFramebufferTransparent(_GLFWwindow* window)
     return GLFW_TRUE;
 }
 
-void _glfwPlatformSetWindowResizable(_GLFWwindow* window, GLFWbool enabled)
+void _glfwSetWindowResizableWin32(_GLFWwindow* window, GLFWbool enabled)
 {
     updateWindowStyles(window);
 }
 
-void _glfwPlatformSetWindowDecorated(_GLFWwindow* window, GLFWbool enabled)
+void _glfwSetWindowDecoratedWin32(_GLFWwindow* window, GLFWbool enabled)
 {
     updateWindowStyles(window);
 }
 
-void _glfwPlatformSetWindowFloating(_GLFWwindow* window, GLFWbool enabled)
+void _glfwSetWindowTitlebarWin32(_GLFWwindow* window, GLFWbool enabled)
+{
+    updateWindowStyles(window);
+}
+
+void _glfwSetWindowFloatingWin32(_GLFWwindow* window, GLFWbool enabled)
 {
     const HWND after = enabled ? HWND_TOPMOST : HWND_NOTOPMOST;
-    SetWindowPos(window->win32.Handle, after, 0, 0, 0, 0,
+    SetWindowPos(window->win32.handle, after, 0, 0, 0, 0,
                  SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
 }
 
-void _glfwPlatformSetWindowMousePassthrough(_GLFWwindow* window, GLFWbool enabled)
+void _glfwSetWindowMousePassthroughWin32(_GLFWwindow* window, GLFWbool enabled)
 {
     COLORREF key = 0;
     BYTE alpha = 0;
     DWORD flags = 0;
-    DWORD exStyle = GetWindowLongW(window->win32.Handle, GWL_EXSTYLE);
+    DWORD exStyle = GetWindowLongW(window->win32.handle, GWL_EXSTYLE);
 
     if (exStyle & WS_EX_LAYERED)
-        GetLayeredWindowAttributes(window->win32.Handle, &key, &alpha, &flags);
+        GetLayeredWindowAttributes(window->win32.handle, &key, &alpha, &flags);
 
     if (enabled)
         exStyle |= (WS_EX_TRANSPARENT | WS_EX_LAYERED);
@@ -1904,19 +2051,19 @@ void _glfwPlatformSetWindowMousePassthrough(_GLFWwindow* window, GLFWbool enable
         }
     }
 
-    SetWindowLongW(window->win32.Handle, GWL_EXSTYLE, exStyle);
+    SetWindowLongW(window->win32.handle, GWL_EXSTYLE, exStyle);
 
     if (enabled)
-        SetLayeredWindowAttributes(window->win32.Handle, key, alpha, flags);
+        SetLayeredWindowAttributes(window->win32.handle, key, alpha, flags);
 }
 
-float _glfwPlatformGetWindowOpacity(_GLFWwindow* window)
+float _glfwGetWindowOpacityWin32(_GLFWwindow* window)
 {
     BYTE alpha;
     DWORD flags;
 
-    if ((GetWindowLongW(window->win32.Handle, GWL_EXSTYLE) & WS_EX_LAYERED) &&
-        GetLayeredWindowAttributes(window->win32.Handle, NULL, &alpha, &flags))
+    if ((GetWindowLongW(window->win32.handle, GWL_EXSTYLE) & WS_EX_LAYERED) &&
+        GetLayeredWindowAttributes(window->win32.handle, NULL, &alpha, &flags))
     {
         if (flags & LWA_ALPHA)
             return alpha / 255.f;
@@ -1925,28 +2072,28 @@ float _glfwPlatformGetWindowOpacity(_GLFWwindow* window)
     return 1.f;
 }
 
-void _glfwPlatformSetWindowOpacity(_GLFWwindow* window, float opacity)
+void _glfwSetWindowOpacityWin32(_GLFWwindow* window, float opacity)
 {
-    LONG exStyle = GetWindowLongW(window->win32.Handle, GWL_EXSTYLE);
+    LONG exStyle = GetWindowLongW(window->win32.handle, GWL_EXSTYLE);
     if (opacity < 1.f || (exStyle & WS_EX_TRANSPARENT))
     {
         const BYTE alpha = (BYTE) (255 * opacity);
         exStyle |= WS_EX_LAYERED;
-        SetWindowLongW(window->win32.Handle, GWL_EXSTYLE, exStyle);
-        SetLayeredWindowAttributes(window->win32.Handle, 0, alpha, LWA_ALPHA);
+        SetWindowLongW(window->win32.handle, GWL_EXSTYLE, exStyle);
+        SetLayeredWindowAttributes(window->win32.handle, 0, alpha, LWA_ALPHA);
     }
     else if (exStyle & WS_EX_TRANSPARENT)
     {
-        SetLayeredWindowAttributes(window->win32.Handle, 0, 0, 0);
+        SetLayeredWindowAttributes(window->win32.handle, 0, 0, 0);
     }
     else
     {
         exStyle &= ~WS_EX_LAYERED;
-        SetWindowLongW(window->win32.Handle, GWL_EXSTYLE, exStyle);
+        SetWindowLongW(window->win32.handle, GWL_EXSTYLE, exStyle);
     }
 }
 
-void _glfwPlatformSetRawMouseMotion(_GLFWwindow *window, GLFWbool enabled)
+void _glfwSetRawMouseMotionWin32(_GLFWwindow *window, GLFWbool enabled)
 {
     if (_glfw.win32.disabledCursorWindow != window)
         return;
@@ -1957,15 +2104,15 @@ void _glfwPlatformSetRawMouseMotion(_GLFWwindow *window, GLFWbool enabled)
         disableRawMouseMotion(window);
 }
 
-GLFWbool _glfwPlatformRawMouseMotionSupported(void)
+GLFWbool _glfwRawMouseMotionSupportedWin32(void)
 {
     return GLFW_TRUE;
 }
 
-void _glfwPlatformPollEvents(void)
+void _glfwPollEventsWin32(void)
 {
     MSG msg;
-    HWND Handle;
+    HWND handle;
     _GLFWwindow* window;
 
     while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
@@ -1997,10 +2144,10 @@ void _glfwPlatformPollEvents(void)
     //       Other Win hotkeys are handled implicitly by _glfwInputWindowFocus
     //       because they change the input focus
     // NOTE: The other half of this is in the WM_*KEY* handler in windowProc
-    Handle = GetActiveWindow();
-    if (Handle)
+    handle = GetActiveWindow();
+    if (handle)
     {
-        window = GetPropW(Handle, L"GLFW");
+        window = GetPropW(handle, L"GLFW");
         if (window)
         {
             int i;
@@ -2032,44 +2179,44 @@ void _glfwPlatformPollEvents(void)
     if (window)
     {
         int width, height;
-        _glfwPlatformGetWindowSize(window, &width, &height);
+        _glfwGetWindowSizeWin32(window, &width, &height);
 
         // NOTE: Re-center the cursor only if it has moved since the last call,
         //       to avoid breaking glfwWaitEvents with WM_MOUSEMOVE
         if (window->win32.lastCursorPosX != width / 2 ||
             window->win32.lastCursorPosY != height / 2)
         {
-            _glfwPlatformSetCursorPos(window, width / 2, height / 2);
+            _glfwSetCursorPosWin32(window, width / 2, height / 2);
         }
     }
 }
 
-void _glfwPlatformWaitEvents(void)
+void _glfwWaitEventsWin32(void)
 {
     WaitMessage();
 
-    _glfwPlatformPollEvents();
+    _glfwPollEventsWin32();
 }
 
-void _glfwPlatformWaitEventsTimeout(double timeout)
+void _glfwWaitEventsTimeoutWin32(double timeout)
 {
     MsgWaitForMultipleObjects(0, NULL, FALSE, (DWORD) (timeout * 1e3), QS_ALLEVENTS);
 
-    _glfwPlatformPollEvents();
+    _glfwPollEventsWin32();
 }
 
-void _glfwPlatformPostEmptyEvent(void)
+void _glfwPostEmptyEventWin32(void)
 {
     PostMessage(_glfw.win32.helperWindowHandle, WM_NULL, 0, 0);
 }
 
-void _glfwPlatformGetCursorPos(_GLFWwindow* window, double* xpos, double* ypos)
+void _glfwGetCursorPosWin32(_GLFWwindow* window, double* xpos, double* ypos)
 {
     POINT pos;
 
     if (GetCursorPos(&pos))
     {
-        ScreenToClient(window->win32.Handle, &pos);
+        ScreenToClient(window->win32.handle, &pos);
 
         if (xpos)
             *xpos = pos.x;
@@ -2078,7 +2225,7 @@ void _glfwPlatformGetCursorPos(_GLFWwindow* window, double* xpos, double* ypos)
     }
 }
 
-void _glfwPlatformSetCursorPos(_GLFWwindow* window, double xpos, double ypos)
+void _glfwSetCursorPosWin32(_GLFWwindow* window, double xpos, double ypos)
 {
     POINT pos = { (int) xpos, (int) ypos };
 
@@ -2086,15 +2233,15 @@ void _glfwPlatformSetCursorPos(_GLFWwindow* window, double xpos, double ypos)
     window->win32.lastCursorPosX = pos.x;
     window->win32.lastCursorPosY = pos.y;
 
-    ClientToScreen(window->win32.Handle, &pos);
+    ClientToScreen(window->win32.handle, &pos);
     SetCursorPos(pos.x, pos.y);
 }
 
-void _glfwPlatformSetCursorMode(_GLFWwindow* window, int mode)
+void _glfwSetCursorModeWin32(_GLFWwindow* window, int mode)
 {
     if (mode == GLFW_CURSOR_DISABLED)
     {
-        if (_glfwPlatformWindowFocused(window))
+        if (_glfwWindowFocusedWin32(window))
             disableCursor(window);
     }
     else if (_glfw.win32.disabledCursorWindow == window)
@@ -2103,35 +2250,35 @@ void _glfwPlatformSetCursorMode(_GLFWwindow* window, int mode)
         updateCursorImage(window);
 }
 
-const char* _glfwPlatformGetScancodeName(int scancode)
+const char* _glfwGetScancodeNameWin32(int scancode)
 {
     if (scancode < 0 || scancode > (KF_EXTENDED | 0xff) ||
         _glfw.win32.keycodes[scancode] == GLFW_KEY_UNKNOWN)
     {
-        _glfwInputError(GLFW_INVALID_VALUE, "Invalid scancode");
+        _glfwInputError(GLFW_INVALID_VALUE, "Invalid scancode %i", scancode);
         return NULL;
     }
 
     return _glfw.win32.keynames[_glfw.win32.keycodes[scancode]];
 }
 
-int _glfwPlatformGetKeyScancode(int key)
+int _glfwGetKeyScancodeWin32(int key)
 {
     return _glfw.win32.scancodes[key];
 }
 
-int _glfwPlatformCreateCursor(_GLFWcursor* cursor,
-                              const GLFWimage* image,
-                              int xhot, int yhot)
+int _glfwCreateCursorWin32(_GLFWcursor* cursor,
+                                   const GLFWimage* image,
+                                   int xhot, int yhot)
 {
-    cursor->win32.Handle = (HCURSOR) createIcon(image, xhot, yhot, GLFW_FALSE);
-    if (!cursor->win32.Handle)
+    cursor->win32.handle = (HCURSOR) createIcon(image, xhot, yhot, GLFW_FALSE);
+    if (!cursor->win32.handle)
         return GLFW_FALSE;
 
     return GLFW_TRUE;
 }
 
-int _glfwPlatformCreateStandardCursor(_GLFWcursor* cursor, int shape)
+int _glfwCreateStandardCursorWin32(_GLFWcursor* cursor, int shape)
 {
     int id = 0;
 
@@ -2172,10 +2319,10 @@ int _glfwPlatformCreateStandardCursor(_GLFWcursor* cursor, int shape)
             return GLFW_FALSE;
     }
 
-    cursor->win32.Handle = LoadImageW(NULL,
+    cursor->win32.handle = LoadImageW(NULL,
                                       MAKEINTRESOURCEW(id), IMAGE_CURSOR, 0, 0,
                                       LR_DEFAULTSIZE | LR_SHARED);
-    if (!cursor->win32.Handle)
+    if (!cursor->win32.handle)
     {
         _glfwInputErrorWin32(GLFW_PLATFORM_ERROR,
                              "Win32: Failed to create standard cursor");
@@ -2185,19 +2332,19 @@ int _glfwPlatformCreateStandardCursor(_GLFWcursor* cursor, int shape)
     return GLFW_TRUE;
 }
 
-void _glfwPlatformDestroyCursor(_GLFWcursor* cursor)
+void _glfwDestroyCursorWin32(_GLFWcursor* cursor)
 {
-    if (cursor->win32.Handle)
-        DestroyIcon((HICON) cursor->win32.Handle);
+    if (cursor->win32.handle)
+        DestroyIcon((HICON) cursor->win32.handle);
 }
 
-void _glfwPlatformSetCursor(_GLFWwindow* window, _GLFWcursor* cursor)
+void _glfwSetCursorWin32(_GLFWwindow* window, _GLFWcursor* cursor)
 {
     if (cursorInContentArea(window))
         updateCursorImage(window);
 }
 
-void _glfwPlatformSetClipboardString(const char* string)
+void _glfwSetClipboardStringWin32(const char* string)
 {
     int characterCount;
     HANDLE object;
@@ -2240,7 +2387,7 @@ void _glfwPlatformSetClipboardString(const char* string)
     CloseClipboard();
 }
 
-const char* _glfwPlatformGetClipboardString(void)
+const char* _glfwGetClipboardStringWin32(void)
 {
     HANDLE object;
     WCHAR* buffer;
@@ -2270,7 +2417,7 @@ const char* _glfwPlatformGetClipboardString(void)
         return NULL;
     }
 
-    free(_glfw.win32.clipboardString);
+    _glfw_free(_glfw.win32.clipboardString);
     _glfw.win32.clipboardString = _glfwCreateUTF8FromWideStringWin32(buffer);
 
     GlobalUnlock(object);
@@ -2279,7 +2426,7 @@ const char* _glfwPlatformGetClipboardString(void)
     return _glfw.win32.clipboardString;
 }
 
-EGLenum _glfwPlatformGetEGLPlatform(EGLint** attribs)
+EGLenum _glfwGetEGLPlatformWin32(EGLint** attribs)
 {
     if (_glfw.egl.ANGLE_platform_angle)
     {
@@ -2309,7 +2456,7 @@ EGLenum _glfwPlatformGetEGLPlatform(EGLint** attribs)
 
         if (type)
         {
-            *attribs = calloc(3, sizeof(EGLint));
+            *attribs = _glfw_calloc(3, sizeof(EGLint));
             (*attribs)[0] = EGL_PLATFORM_ANGLE_TYPE_ANGLE;
             (*attribs)[1] = type;
             (*attribs)[2] = EGL_NONE;
@@ -2320,17 +2467,17 @@ EGLenum _glfwPlatformGetEGLPlatform(EGLint** attribs)
     return 0;
 }
 
-EGLNativeDisplayType _glfwPlatformGetEGLNativeDisplay(void)
+EGLNativeDisplayType _glfwGetEGLNativeDisplayWin32(void)
 {
     return GetDC(_glfw.win32.helperWindowHandle);
 }
 
-EGLNativeWindowType _glfwPlatformGetEGLNativeWindow(_GLFWwindow* window)
+EGLNativeWindowType _glfwGetEGLNativeWindowWin32(_GLFWwindow* window)
 {
-    return window->win32.Handle;
+    return window->win32.handle;
 }
 
-void _glfwPlatformGetRequiredInstanceExtensions(char** extensions)
+void _glfwGetRequiredInstanceExtensionsWin32(char** extensions)
 {
     if (!_glfw.vk.KHR_surface || !_glfw.vk.KHR_win32_surface)
         return;
@@ -2339,9 +2486,9 @@ void _glfwPlatformGetRequiredInstanceExtensions(char** extensions)
     extensions[1] = "VK_KHR_win32_surface";
 }
 
-int _glfwPlatformGetPhysicalDevicePresentationSupport(VkInstance instance,
-                                                      VkPhysicalDevice device,
-                                                      uint32_t queuefamily)
+int _glfwGetPhysicalDevicePresentationSupportWin32(VkInstance instance,
+                                                   VkPhysicalDevice device,
+                                                   uint32_t queuefamily)
 {
     PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR
         vkGetPhysicalDeviceWin32PresentationSupportKHR =
@@ -2357,10 +2504,10 @@ int _glfwPlatformGetPhysicalDevicePresentationSupport(VkInstance instance,
     return vkGetPhysicalDeviceWin32PresentationSupportKHR(device, queuefamily);
 }
 
-VkResult _glfwPlatformCreateWindowSurface(VkInstance instance,
-                                          _GLFWwindow* window,
-                                          const VkAllocationCallbacks* allocator,
-                                          VkSurfaceKHR* surface)
+VkResult _glfwCreateWindowSurfaceWin32(VkInstance instance,
+                                       _GLFWwindow* window,
+                                       const VkAllocationCallbacks* allocator,
+                                       VkSurfaceKHR* surface)
 {
     VkResult err;
     VkWin32SurfaceCreateInfoKHR sci;
@@ -2378,7 +2525,7 @@ VkResult _glfwPlatformCreateWindowSurface(VkInstance instance,
     memset(&sci, 0, sizeof(sci));
     sci.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
     sci.hinstance = GetModuleHandle(NULL);
-    sci.hwnd = window->win32.Handle;
+    sci.hwnd = window->win32.handle;
 
     err = vkCreateWin32SurfaceKHR(instance, &sci, allocator, surface);
     if (err)
@@ -2391,15 +2538,18 @@ VkResult _glfwPlatformCreateWindowSurface(VkInstance instance,
     return err;
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW native API                       //////
-//////////////////////////////////////////////////////////////////////////
-
-GLFWAPI HWND glfwGetWin32Window(GLFWwindow* Handle)
+GLFWAPI HWND glfwGetWin32Window(GLFWwindow* handle)
 {
-    _GLFWwindow* window = (_GLFWwindow*) Handle;
+    _GLFWwindow* window = (_GLFWwindow*) handle;
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
-    return window->win32.Handle;
+
+    if (_glfw.platform.platformID != GLFW_PLATFORM_WIN32)
+    {
+        _glfwInputError(GLFW_PLATFORM_UNAVAILABLE,
+                        "Win32: Platform not initialized");
+        return NULL;
+    }
+
+    return window->win32.handle;
 }
 

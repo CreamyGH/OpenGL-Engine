@@ -1,0 +1,6 @@
+[submodule "External/glfw"]
+	path = External/glfw
+	url = https://github.com/TheCherno/glfw.git
+[submodule "External/entt"]
+	path = External/entt
+	url = https://github.com/skypjack/entt.git

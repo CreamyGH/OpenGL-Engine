@@ -1,4 +1,4 @@
- project "Renderer"
+project "ECS"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++20"
@@ -9,31 +9,19 @@
 	
 	includedirs
 	{
-		"%{IncludeDir.stb_image}",
-		"%{wks.location}/External/",
-		"%{wks.location}/External/glm",
-		"%{wks.location}/External/assimp/include",
-		"%{wks.location}/Engine/Core/Source",
-		"%{wks.location}/Engine/Assets/Source",
-		"%{wks.location}/Engine/Graphics/Source",
-	}
-
-	libdirs 
-	{
-		"%{wks.location}/External/vulkan_lib/",
-	}
-
-	links
-	{
-		"vulkan-1.lib",
-		"External",
-		"Core",
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.glm}",
 	}
 
 	files
 	{
-		"**.h",
-		"**.cpp",
+		"src/**.h",
+		"src/**.cpp",
+	}
+
+    links
+	{
+		"External",
 	}
 
 	filter "system:windows"
@@ -44,25 +32,9 @@
 		defines "DEBUG=1"
 		runtime "Debug"
 		symbols "on"
-		links
-		{
-			"shaderc_sharedd.lib",
-			"shaderc_utild.lib",
-			"spirv-cross-cored.lib",
-			"spirv-cross-glsld.lib",
-			"SPIRV-Toolsd.lib",
-		}
+
 
 	filter "configurations:Release"
 		defines "RELEASE=1"
 		runtime "Release"
 		optimize "on"
-		links
-		{
-			"shaderc_shared.lib",
-			"shaderc_util.lib",
-			"spirv-cross-core.lib",
-			"spirv-cross-glsl.lib",
-			"SPIRV-Toolsd.lib",
-		}
-

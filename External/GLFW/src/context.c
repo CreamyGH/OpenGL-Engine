@@ -196,12 +196,6 @@ const _GLFWfbconfig* _glfwChooseFBConfig(const _GLFWfbconfig* desired,
             continue;
         }
 
-        if (desired->doublebuffer != current->doublebuffer)
-        {
-            // Double buffering is a hard constraint
-            continue;
-        }
-
         // Count number of missing buffers
         {
             missing = 0;
@@ -570,7 +564,9 @@ GLFWbool _glfwRefreshContextAttribs(_GLFWwindow* window,
         PFNGLCLEARPROC glClear = (PFNGLCLEARPROC)
             window->context.getProcAddress("glClear");
         glClear(GL_COLOR_BUFFER_BIT);
-        window->context.swapBuffers(window);
+
+        if (window->doublebuffer)
+            window->context.swapBuffers(window);
     }
 
     glfwMakeContextCurrent((GLFWwindow*) previous);
@@ -610,9 +606,9 @@ GLFWbool _glfwStringInExtensionString(const char* string, const char* extensions
 //////                        GLFW public API                       //////
 //////////////////////////////////////////////////////////////////////////
 
-GLFWAPI void glfwMakeContextCurrent(GLFWwindow* Handle)
+GLFWAPI void glfwMakeContextCurrent(GLFWwindow* handle)
 {
-    _GLFWwindow* window = (_GLFWwindow*) Handle;
+    _GLFWwindow* window = (_GLFWwindow*) handle;
     _GLFWwindow* previous = _glfwPlatformGetTls(&_glfw.contextSlot);
 
     _GLFW_REQUIRE_INIT();
@@ -640,9 +636,9 @@ GLFWAPI GLFWwindow* glfwGetCurrentContext(void)
     return _glfwPlatformGetTls(&_glfw.contextSlot);
 }
 
-GLFWAPI void glfwSwapBuffers(GLFWwindow* Handle)
+GLFWAPI void glfwSwapBuffers(GLFWwindow* handle)
 {
-    _GLFWwindow* window = (_GLFWwindow*) Handle;
+    _GLFWwindow* window = (_GLFWwindow*) handle;
     assert(window != NULL);
 
     _GLFW_REQUIRE_INIT();

@@ -21,6 +21,7 @@ project "External"
 		"%{wks.location}/External/stb_image/**.h",
 		"%{wks.location}/External/stb_image/**.cpp",
 		"%{wks.location}/External/assimp/include/assimp/*",
+		"%{wks.location}/External/entt/src/**.hpp",
 	}
 
 
