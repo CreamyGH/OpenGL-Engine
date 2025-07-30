@@ -7,11 +7,15 @@ project "Core"
 	targetdir ("%{wks.location}/bin/" .. outputdir.. "/%{prj.name}")
 	objdir    ("%{wks.location}/bin-int/" .. outputdir.. "/%{prj.name}")
 	
+	pchheader "pch.h"
+	pchsource "src/pch.cpp"
+
 	includedirs
 	{
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.spdlog}",
 	}
 
 	libdirs 

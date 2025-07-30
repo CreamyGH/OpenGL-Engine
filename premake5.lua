@@ -16,6 +16,7 @@ workspace "OpenGL-Engine"
 	IncludeDir["glm"] = "%{wks.location}/External/glm"
 	IncludeDir["stb_image"] = "%{wks.location}/External/stb_image"
 	IncludeDir["entt"] = "%{wks.location}/External/entt/src"
+	IncludeDir["spdlog"] = "%{wks.location}/External/spdlog/include"
 
 group "Dependencies"
 	include "External/GLFW"

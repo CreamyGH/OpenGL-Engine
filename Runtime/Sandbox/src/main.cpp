@@ -1,6 +1,8 @@
 #include <entt/entt.hpp>
 #include "iostream"
 
+
+
 struct position {
     float x;
     float y;
@@ -19,6 +21,7 @@ void update(entt::registry& registry) {
 
     // use an extended callback
     view.each([](const auto entity, const auto& pos, auto& vel) { /* ... */ });
+
 
     // use a range-for
     for (auto [entity, pos, vel] : view.each()) 
