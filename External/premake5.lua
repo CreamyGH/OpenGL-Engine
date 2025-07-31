@@ -22,7 +22,7 @@ project "External"
 		"%{wks.location}/External/stb_image/**.cpp",
 		"%{wks.location}/External/assimp/include/assimp/*",
 		"%{wks.location}/External/entt/src/**.hpp",
-		"%{wks.location}/External/spdlog/include/spdlog/**.h",
+		"%{wks.location}/External/spdlog/include/spdlog/*",
 	}
 
 

@@ -11,7 +11,7 @@ project "Sandbox"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}",
+		"%{IncludeDir.spdlog}",
 		"%{wks.location}/Engine/Core/src",
 		"%{wks.location}/Engine/Renderer/src",
 		"%{wks.location}/Engine/Assets/src",
