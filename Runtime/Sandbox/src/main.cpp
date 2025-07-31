@@ -1,13 +1,17 @@
-#include "Log.h"
+#include "SandboxApp.h"
 
-#include "cassert"
 
-int main() 
+int main()
 {
-    Core::Log::Init();
+	Core::AppConfig config;
 
-    LOG_INFO("info");
-    LOG_WARN("warn");
-    LOG_CRITICAL("critical");
-    LOG_TRACE("trace");
+	config.title = "OpenGL-Engine - Sandbox";
+	config.windowWidth = 1920;
+	config.windowHeight = 1080;
+	config.vsyncEnabled = true;
+
+	std::unique_ptr<SandboxApp> app = std::make_unique<SandboxApp>();
+
+	app->Init(config);
+	app->Run();
 }

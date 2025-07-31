@@ -14,7 +14,6 @@ project "Core"
 	{
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.glm}",
 		"%{IncludeDir.spdlog}",
 	}
 
@@ -39,6 +38,11 @@ project "Core"
 	filter "system:windows"
 		systemversion "latest"
 		staticruntime "off"
+
+		defines
+		{
+			"GLFW_INCLUDE_NONE"
+		}
 
 	filter "configurations:Debug"
 		defines "DEBUG=1"
