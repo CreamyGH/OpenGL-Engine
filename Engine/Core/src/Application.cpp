@@ -3,11 +3,10 @@
 
 namespace Core
 {
-	void Application::Init(const AppConfig& config)
+	void Application::Init(const WindowConfig& winConfig)
 	{
 		Log::Init();
-		m_Window = std::make_shared<Window>(config.title, config.windowWidth, config.windowHeight);
-		m_Window->SetVSync(config.vsyncEnabled);
+		m_Window = std::make_shared<Window>(winConfig);
 	}
 
 	void Application::Run()

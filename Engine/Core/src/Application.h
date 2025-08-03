@@ -4,20 +4,14 @@
 #include "Timestep.h"
 #include "Log.h"
 
-namespace Core
-{
-	struct AppConfig
-	{
-		std::string title = "undefined";
-		uint32_t windowWidth = 0;
-		uint32_t windowHeight = 0;
-		bool vsyncEnabled = false;
-	};
+#include "Events/EventManager.h"
 
+namespace Core
+{	
 	class Application
 	{
 	public:
-		void Init(const AppConfig& config);
+		void Init(const WindowConfig& winConfig);
 
 		void Run();
 

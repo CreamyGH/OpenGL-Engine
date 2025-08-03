@@ -6,10 +6,18 @@
 
 namespace Core
 {
+	struct WindowConfig
+	{
+		std::string title;
+		uint32_t width;
+		uint32_t height;
+		bool vSyncEnabled;
+	};
+
 	class Window
 	{
 	public:
-		Window(const std::string& name, uint32_t width, uint32_t height);
+		Window(const WindowConfig& config);
 		~Window();
 
 		GLFWwindow* getHandle() { return m_Handle; }
@@ -22,14 +30,13 @@ namespace Core
 		void Update();
 		bool isOpened();
 
-	public:
-		bool resized = false;
-
 	private:
 		void SetInputCallbacks();
+		void SetWindowCallbacks();
 
 	private:
-		GLFWwindow* m_Handle;
-		uint32_t m_Width, m_Height;
+		GLFWwindow* m_Handle = nullptr;
+		uint32_t m_Width = 0;
+		uint32_t m_Height = 0;
 	};
 }

@@ -3,15 +3,15 @@
 
 int main()
 {
-	Core::AppConfig config;
+	Core::WindowConfig winConfig;
 
-	config.title = "OpenGL-Engine - Sandbox";
-	config.windowWidth = 1920;
-	config.windowHeight = 1080;
-	config.vsyncEnabled = true;
+	winConfig.title = "OpenGL-Engine - Sandbox";
+	winConfig.width = 1920;
+	winConfig.height = 1080;
+	winConfig.vSyncEnabled = true;
 
 	std::unique_ptr<SandboxApp> app = std::make_unique<SandboxApp>();
 
-	app->Init(config);
+	app->Init(winConfig);
 	app->Run();
 }

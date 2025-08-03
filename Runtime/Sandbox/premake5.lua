@@ -75,6 +75,11 @@ project "Sandbox"
 		systemversion "latest"
 		staticruntime "off"
 
+		defines
+		{
+			"GLFW_INCLUDE_NONE"
+		}
+
 	filter "configurations:Debug"
 		defines "DEBUG=1"
 		runtime "Debug"
