@@ -11,6 +11,7 @@ project "ECS"
 	{
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.glm}",
+		"%{wks.location}/Engine/Core/src",
 	}
 
 	files

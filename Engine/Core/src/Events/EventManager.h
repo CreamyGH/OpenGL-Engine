@@ -4,9 +4,9 @@
 
 namespace Core
 {
-	#define PUBLISH_EVENT(event) EventManager::get().PublishEvent(event)
-	#define EVENT_LOG_CATEGORY(category) EventManager::get().SetLoggingCategoryMask(category)
-	#define BIND_EVENT_FN(fn) [this](auto& ev) -> bool { return this->fn(ev); }
+#define PUBLISH_EVENT(event) EventManager::get().PublishEvent(event)
+#define EVENT_LOG_CATEGORY(category) EventManager::get().SetLoggingCategoryMask(category)
+#define BIND_EVENT_FN(fn) [this](auto& ev) -> bool { return this->fn(ev); }
 
 	using EventCallbackFn = std::function<bool(Event&)>;
 
