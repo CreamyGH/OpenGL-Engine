@@ -1,6 +1,9 @@
 #pragma once
-
 #include "pch.h"
+
+#include "Events/EventManager.h"
+#include "Events/KeyEvent.h"
+#include "Events/MouseEvent.h"
 
 #include <GLFW/glfw3.h>
 
@@ -22,8 +25,8 @@ namespace Core
 
 		GLFWwindow* getHandle() { return m_Handle; }
 
-		uint32_t getWidth() { return m_Width; }
-		uint32_t getHeight() { return m_Height; }
+		uint32_t getWidth() const { return m_Width; }
+		uint32_t getHeight() const { return m_Height; }
 
 		void SetVSync(bool enable);
 

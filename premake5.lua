@@ -20,8 +20,8 @@ workspace "OpenGL-Engine"
 	IncludeDir["assimp"] = "%{wks.location}/External/assimp/include"
 
 group "Dependencies"
-	include "External/GLFW"
 	include "External/Glad"
+	include "External/glfw"
 	include "External"
 
 group "Engine"

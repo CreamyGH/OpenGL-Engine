@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Window.h" 
 
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
 namespace Core
@@ -42,12 +41,71 @@ namespace Core
 
 		SetWindowCallbacks();
 		SetInputCallbacks();
-		//Uwazaj bo nie ma viewportu nie wiem czy nie trzeba pozniej dodac
 	}
 
 	void Window::SetInputCallbacks()
 	{
-		//TODO add when event system is ready
+		glfwSetKeyCallback(m_Handle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		{
+			switch (action)
+			{
+				case GLFW_PRESS:
+				{
+					KeyPressedEvent event(key, 0);
+					PUBLISH_EVENT(event);
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					KeyReleasedEvent event(key);
+					PUBLISH_EVENT(event);
+					break;
+				}
+				case GLFW_REPEAT:
+				{
+					KeyPressedEvent event(key, 1);
+					PUBLISH_EVENT(event);
+					break;
+				}
+			}
+		});
+
+		glfwSetCharCallback(m_Handle, [](GLFWwindow* window, uint32_t keycode)
+		{
+				KeyTypedEvent event(keycode);
+				PUBLISH_EVENT(event);
+		});
+
+		glfwSetMouseButtonCallback(m_Handle, [](GLFWwindow* window, int button, int action, int mods)
+		{
+			switch (action)
+			{
+				case GLFW_PRESS:
+				{
+					MouseButtonPressedEvent event(button);
+					PUBLISH_EVENT(event);
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					MouseButtonReleasedEvent event(button);
+					PUBLISH_EVENT(event);
+					break;
+				}
+			}
+		});
+
+		glfwSetScrollCallback(m_Handle, [](GLFWwindow* window, double xOffset, double yOffset)
+		{
+			MouseScrolledEvent event((float)xOffset, (float)yOffset);
+			PUBLISH_EVENT(event);
+		});
+
+		glfwSetCursorPosCallback(m_Handle, [](GLFWwindow* window, double xPos, double yPos)
+		{
+			MouseMovedEvent event((float)xPos, (float)yPos);
+			PUBLISH_EVENT(event);
+		});
 	}
 
 	void Window::SetWindowCallbacks()

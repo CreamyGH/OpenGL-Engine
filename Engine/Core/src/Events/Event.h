@@ -6,7 +6,6 @@ namespace Core
 	enum class EventType
 	{
 		None = 0,
-		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
@@ -34,7 +33,7 @@ namespace Core
 		virtual EventType GetEventType() const = 0;
 		virtual const char* GetName() const = 0;
 		virtual int GetCategoryFlags() const = 0;
-		virtual void LogInfo() const = 0;
+		virtual const std::string LogInfo() const = 0;
 
 		inline bool IsInCategory(EventCategory category)
 		{

@@ -7,6 +7,7 @@ namespace Core
 	{
 		Log::Init();
 		m_Window = std::make_shared<Window>(winConfig);
+		Input::get().Init(m_Window->getHandle());
 	}
 
 	void Application::Run()
@@ -17,6 +18,8 @@ namespace Core
 
 		while (m_Window->isOpened())
 		{
+			Input::get().Update();
+
 			float time = (float)glfwGetTime();
 			Timestep timestep = time - lastFrameTime;
 			lastFrameTime = time;

@@ -3,8 +3,7 @@
 #include "Window.h"
 #include "Timestep.h"
 #include "Log.h"
-
-#include "Events/EventManager.h"
+#include "Input.h"
 
 namespace Core
 {	

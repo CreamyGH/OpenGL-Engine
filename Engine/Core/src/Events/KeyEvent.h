@@ -1,17 +1,76 @@
 #pragma once
+
 #include "Event.h"
 
-namespace Core
+namespace Core 
 {
-	class TestEvent : public Event
+
+	class KeyEvent : public Event
 	{
 	public:
-		EVENT_CLASS_CATEGORY(EventCategory::EventCategoryKeyboard);
-		EVENT_CLASS_TYPE(KeyPressed);
+		inline int GetKeyCode() const { return m_KeyCode; }
 
-		void LogInfo() const override
-		{
-			LOG_INFO("Logging from event");
+		EVENT_CLASS_CATEGORY(EventCategoryKeyboard)
+	protected:
+		KeyEvent(int keycode)
+			: m_KeyCode(keycode) {
 		}
+
+		int m_KeyCode;
+	};
+
+	class KeyPressedEvent : public KeyEvent
+	{
+	public:
+		KeyPressedEvent(int keycode, int repeatCount)
+			: KeyEvent(keycode), m_RepeatCount(repeatCount) {
+		}
+
+		inline int GetRepeatCount() const { return m_RepeatCount; }
+
+		const std::string LogInfo() const override
+		{
+			std::stringstream ss;
+			ss << "Keycode: " << m_KeyCode << " (" << m_RepeatCount << " repeats)";
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(KeyPressed)
+	private:
+		int m_RepeatCount;
+	};
+
+	class KeyReleasedEvent : public KeyEvent
+	{
+	public:
+		KeyReleasedEvent(int keycode)
+			: KeyEvent(keycode) {
+		}
+
+		const std::string LogInfo() const override
+		{
+			std::stringstream ss;
+			ss << "Keycode: " << m_KeyCode;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(KeyReleased)
+	};
+
+	class KeyTypedEvent : public KeyEvent
+	{
+	public:
+		KeyTypedEvent(int keycode)
+			: KeyEvent(keycode) {
+		}
+
+		const std::string LogInfo() const override
+		{
+			std::stringstream ss;
+			ss << "Keycode: " << m_KeyCode;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(KeyTyped)
 	};
 }

@@ -12,7 +12,7 @@ namespace Core
 
 	class EventManager : public Singleton<EventManager>
 	{
-		friend class Singleton<EventManager>;
+	friend class Singleton<EventManager>;
 
 	public:
 		void SetLoggingCategoryMask(int CategoryMask) { m_LoggingCategoryMask = CategoryMask; }
@@ -49,8 +49,7 @@ namespace Core
 			if (event.IsInCategory(m_LoggingCategoryMask) 
 				&& !event.IsInCategory(EventCategory::None))
 			{
-				LOG_INFO("[Event]: {0}", event.GetName());
-				event.LogInfo();
+				LOG_TRACE("[Event] {0} {1}", event.GetName(), event.LogInfo());
 			}
 		}
 

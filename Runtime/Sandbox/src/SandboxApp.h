@@ -1,7 +1,7 @@
 #pragma once
 #include "Application.h"
 
-#include "Events/KeyEvent.h"
+#include "Events/EventManager.h"
 
 class SandboxApp : public Core::Application
 {
@@ -12,6 +12,8 @@ public:
 	void OnUpdate(Core::Timestep timestep) override;
 	void OnDestroy() override;
 
+
 private:
-	bool TestEventFunction(Core::TestEvent& e);
+	Core::Input& m_Input = Core::Input::get();
+	Core::EventManager& m_EventManager = Core::EventManager::get();
 };
