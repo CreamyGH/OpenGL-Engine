@@ -15,5 +15,4 @@ public:
 
 private:
 	Core::Input& m_Input = Core::Input::get();
-	Core::EventManager& m_EventManager = Core::EventManager::get();
 };

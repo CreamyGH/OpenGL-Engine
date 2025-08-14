@@ -4,7 +4,6 @@
 
 namespace Core 
 {
-
 	class MouseMovedEvent : public Event
 	{
 	public:
@@ -14,16 +13,16 @@ namespace Core
 
 		inline float GetX() const { return m_MouseX; }
 		inline float GetY() const { return m_MouseY; }
-
-		const std::string LogInfo() const override
+		
+		std::string LogInfo() const override
 		{
 			std::stringstream ss;
 			ss << "XY: " << m_MouseX << ", " << m_MouseY;
 			return ss.str();
 		}
 
-		EVENT_CLASS_TYPE(MouseMoved)
-		EVENT_CLASS_CATEGORY(EventCategoryMouse)
+		EVENT_CLASS_TYPE(EventTypes::MouseMoved, "MouseMoved")
+		EVENT_CLASS_CATEGORY(EventCategories::Mouse)
 	private:
 		float m_MouseX, m_MouseY;
 	};
@@ -38,15 +37,15 @@ namespace Core
 		inline float GetXOffset() const { return m_XOffset; }
 		inline float GetYOffset() const { return m_YOffset; }
 
-		const std::string LogInfo() const override
+		std::string LogInfo() const override
 		{
 			std::stringstream ss;
 			ss << "Offset XY: " << GetXOffset() << ", " << GetYOffset();
 			return ss.str();
 		}
 
-		EVENT_CLASS_TYPE(MouseScrolled)
-		EVENT_CLASS_CATEGORY(EventCategoryMouse)
+		EVENT_CLASS_TYPE(EventTypes::MouseScrolled, "MouseScrolled")
+		EVENT_CLASS_CATEGORY(EventCategories::Mouse)
 	private:
 		float m_XOffset, m_YOffset;
 	};
@@ -56,7 +55,8 @@ namespace Core
 	public:
 		inline int GetMouseButton() const { return m_Button; }
 
-		EVENT_CLASS_CATEGORY(EventCategoryMouse)
+		EVENT_CLASS_CATEGORY(EventCategories::Mouse)
+
 	protected:
 		MouseButtonEvent(int button)
 			: m_Button(button) {
@@ -72,14 +72,14 @@ namespace Core
 			: MouseButtonEvent(button) {
 		}
 
-		const std::string LogInfo() const override
+		std::string LogInfo() const override
 		{
 			std::stringstream ss;
 			ss << "Button: " << m_Button;
 			return ss.str();
 		}
 
-		EVENT_CLASS_TYPE(MouseButtonPressed)
+		EVENT_CLASS_TYPE(EventTypes::MouseButtonPressed, "MouseButtonPressed")
 	};
 
 	class MouseButtonReleasedEvent : public MouseButtonEvent
@@ -89,14 +89,14 @@ namespace Core
 			: MouseButtonEvent(button) {
 		}
 
-		const std::string LogInfo() const override
+		std::string LogInfo() const override
 		{
 			std::stringstream ss;
 			ss << "Button: " << m_Button;
 			return ss.str();
 		}
 
-		EVENT_CLASS_TYPE(MouseButtonReleased)
+		EVENT_CLASS_TYPE(EventTypes::MouseButtonReleased, "MouseButtonReleased")
 	};
 
 }

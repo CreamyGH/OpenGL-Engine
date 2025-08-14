@@ -5,6 +5,8 @@
 #include "Helpers/Singleton.h"
 #include "Timestep.h"
 
+//TODO create and publish component events
+
 namespace ECS
 {
 	class SystemManager : public Singleton<SystemManager>

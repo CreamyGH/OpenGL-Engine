@@ -112,10 +112,21 @@ namespace Core
 	{
 		glfwSetWindowSizeCallback(m_Handle, [](GLFWwindow* window, int width, int height)
 		{
-				Window* wnd = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-				wnd->m_Width = width;
-				wnd->m_Height = height;
+			Window* wnd = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+			wnd->m_Width = width;
+			wnd->m_Height = height;
+			
+			WindowResizeEvent event((uint32_t)width, (uint32_t)height);
+			PUBLISH_EVENT(event);
 		});
+
+		glfwSetWindowCloseCallback(m_Handle, [](GLFWwindow* window)
+		{
+			Window* wnd = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+			WindowCloseEvent event;
+			PUBLISH_EVENT(event);
+		});
+
 	}
 
 	void Window::Update()

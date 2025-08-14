@@ -15,7 +15,6 @@ project "Core"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
-		
 		"%{IncludeDir.spdlog}",
 	}
 

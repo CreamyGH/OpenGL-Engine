@@ -1,9 +1,12 @@
 #pragma once
 #include "pch.h"
 
+
 #include "Events/EventManager.h"
+
 #include "Events/KeyEvent.h"
 #include "Events/MouseEvent.h"
+#include "Events/WindowEvent.h"
 
 #include <GLFW/glfw3.h>
 

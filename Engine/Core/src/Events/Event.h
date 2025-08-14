@@ -3,46 +3,36 @@
 
 namespace Core
 {
-	enum class EventType
-	{
-		None = 0,
-		KeyPressed, KeyReleased, KeyTyped,
-		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
-	};
-
-	enum EventCategory
-	{
-		None = 0,
-		EventCategoryWindow =      (1 << 0),
-		EventCategoryKeyboard =    (1 << 1),
-		EventCategoryMouse =       (1 << 2),
-		EventCategoryMouseButton = (1 << 3)
-	};
-
-	#define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::##type; }\
-								virtual EventType GetEventType() const override { return GetStaticType(); }\
-								virtual const char* GetName() const override { return #type; }
-
-	#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
-
-	class Event
-	{
-	public:
-		bool Handled = false;
-
-		virtual EventType GetEventType() const = 0;
-		virtual const char* GetName() const = 0;
-		virtual int GetCategoryFlags() const = 0;
-		virtual const std::string LogInfo() const = 0;
-
-		inline bool IsInCategory(EventCategory category)
-		{
-			return GetCategoryFlags() & category;
-		}
-
-		inline bool IsInCategory(int categoryMask) const
-		{
-			return (GetCategoryFlags() & categoryMask) != 0;
-		}
-	};
+    using EventTypeID       = uint32_t;   
+    using EventCategoryMask = uint32_t;   
+    
+    
+    #define EVENT_CLASS_TYPE(ID_CONST, NAME_LITERAL)                                  \
+        static constexpr EventTypeID StaticType() { return (ID_CONST); }              \
+        EventTypeID GetType() const override { return StaticType(); }                 \
+        const char* GetName() const override { return (NAME_LITERAL); }
+    
+    
+    #define EVENT_CLASS_CATEGORY(MASK_EXPR)                                         \
+        EventCategoryMask GetCategoryMask() const override { return (MASK_EXPR); }
+    
+    
+    class Event 
+    {
+    public:
+        virtual ~Event() = default;
+    
+        bool Handled = false;
+    
+        virtual EventTypeID GetType() const = 0;  
+        virtual const char* GetName() const = 0;
+        virtual EventCategoryMask GetCategoryMask() const = 0;
+        virtual std::string LogInfo() const = 0;
+    
+    
+        bool IsInCategory(EventCategoryMask mask) const {
+            return (GetCategoryMask() & mask) != 0;
+        }
+    };
 }
+

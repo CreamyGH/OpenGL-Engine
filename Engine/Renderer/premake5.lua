@@ -12,6 +12,7 @@ project "Renderer"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.spdlog}",
 		"%{wks.location}/Engine/Core/src",
 		"%{wks.location}/Engine/Assets/src",
 	}
@@ -25,9 +26,9 @@ project "Renderer"
 	{
 		"GLFW",
 		"Glad",
+		"External",
 		"Assets",
 		"Core",
-		"External",
 		"opengl32.lib",
 	}
 
@@ -40,6 +41,11 @@ project "Renderer"
 	filter "system:windows"
 		systemversion "latest"
 		staticruntime "off"
+
+		defines
+		{
+			"GLFW_INCLUDE_NONE"
+		}
 
 	filter "configurations:Debug"
 		defines "DEBUG=1"
