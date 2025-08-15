@@ -1,26 +1,59 @@
 #pragma once
 
-#include "Timestep.h"
-#include "entt/entt.hpp"
+#include <entt/entt.hpp>
 
-//TODO add funcitions when component:
-// has been added
-// has been modified
-// has been deleted
-// and add pointer to that specific component
+#include "FrameData.h"
+#include "Timestep.h"
 
 namespace ECS
 {
 	#define SYSTEM_EXEC_ORDER(order) virtual uint32_t GetExecOrded() const override { return order; }
+    #define BIND_COMP_FN(ComponentT, method) \
+    [this](entt::entity e, ComponentT& comp) { this->method(e, comp); }
+
+    template<typename ComponentT>
+    using ComponentCallback = std::function<void(entt::entity, ComponentT&)>;
 
 	class System
 	{
 	public:
-		virtual void OnSystemCreate() {};
-		virtual void OnSystemDestroy() {};
+		inline void SetActiveRegistry(entt::registry* activeRegistry) { m_Registry = activeRegistry; }
+		virtual void OnSystemCreate() {}
+		virtual void OnSystemDestroy() {}
 
-		//virtual void OnUpdate(entt::registry& registry, Core::Timestep timestep) = 0;
+		virtual void ModifyFrameData(FrameData& frameData) {}
 
 		virtual uint32_t GetExecOrded() const = 0;
+
+	protected:
+        template<typename ComponentT>
+        void AttachOnConstructComponent(ComponentCallback<ComponentT> cb)
+        {
+            m_Registry->on_construct<ComponentT>().connect([cb](entt::registry& reg, entt::entity e)
+            {
+                cb(e, reg.get<ComponentT>(e));
+            });
+        }
+
+        template<typename ComponentT>
+        void AttachOnUpdateComponent(ComponentCallback<ComponentT> cb)
+        {
+            m_Registry->on_update<ComponentT>().connect([cb](entt::registry& reg, entt::entity e)
+            {
+                cb(e, reg.get<ComponentT>(e));
+            });
+        }
+
+        template<typename ComponentT>
+        void AttachOnDestroyComponent(ComponentCallback<ComponentT> cb)
+        {
+            m_Registry->on_destroy<ComponentT>().connect([cb](entt::registry& reg, entt::entity e)
+            {
+                cb(e, reg.get<ComponentT>(e));
+            });
+        }
+
+    protected:
+        entt::registry* m_Registry = nullptr;
 	};
 }

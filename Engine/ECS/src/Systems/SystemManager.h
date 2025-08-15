@@ -24,15 +24,32 @@ namespace ECS
 			m_SystemsByOrder[execOrder] = std::move(system);
 		}
 
-		void UpdateSystems(entt::registry& activeRegistry, Core::Timestep timestep)
+		void CollectFrameData(FrameData& frameData)
 		{
 			for (size_t order = 0; order < m_SystemsByOrder.size(); order++)
 			{
-				m_SystemsByOrder[order]->OnUpdate(activeRegistry, timestep);
+				m_SystemsByOrder[order]->ModifyFrameData(frameData);
 			}
 		}
 
 	private:
 		std::map<uint32_t, std::unique_ptr<System>> m_SystemsByOrder;
+
+	private:
+		SystemManager()
+		{
+			for (size_t order = 0; order < m_SystemsByOrder.size(); order++)
+			{
+				m_SystemsByOrder[order]->OnSystemCreate();
+			}
+		}
+
+		~SystemManager()
+		{
+			for (size_t order = 0; order < m_SystemsByOrder.size(); order++)
+			{
+				m_SystemsByOrder[order]->OnSystemDestroy();
+			}
+		}
 	};
 }

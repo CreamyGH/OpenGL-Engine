@@ -27,7 +27,7 @@ namespace Core
         virtual EventTypeID GetType() const = 0;  
         virtual const char* GetName() const = 0;
         virtual EventCategoryMask GetCategoryMask() const = 0;
-        virtual std::string LogInfo() const = 0;
+        virtual std::string LogInfo() const { return ""; }
     
     
         bool IsInCategory(EventCategoryMask mask) const {
