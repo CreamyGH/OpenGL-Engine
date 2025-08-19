@@ -13,6 +13,7 @@ project "Assets"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.assimp}",
 		"%{wks.location}/External/assimp/include",
 		"%{wks.location}/Engine/Core/src",
 		"%{wks.location}/Engine/Assets/src",
@@ -20,11 +21,10 @@ project "Assets"
 
 	links
 	{
-		"GLFW",
-		"Glad",
 		"Core",
 		"External",
-		"opengl32.lib",
+		"Glad",
+		"GLFW",
 	}
 
 	files
@@ -34,8 +34,13 @@ project "Assets"
 	}
 
 	filter "system:windows"
-		systemversion "latest"
-		staticruntime "off"
+			systemversion "latest"
+			staticruntime "off"
+			links { "opengl32.lib" }
+
+	filter "system:linux"
+			pic "On"
+			links { "GL", "pthread", "dl", "X11" }
 
 	filter "configurations:Debug"
 		defines "DEBUG=1"

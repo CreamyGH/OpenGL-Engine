@@ -30,6 +30,9 @@ project "External"
 		systemversion "latest"
 		staticruntime "off"
 
+	filter "system:linux"
+        pic "On"
+
 	filter "configurations:Debug"
 		defines "DEBUG=1"
 		runtime "Debug"

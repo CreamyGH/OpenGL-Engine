@@ -17,10 +17,6 @@ project "Renderer"
 		"%{wks.location}/Engine/Assets/src",
 	}
 
-	libdirs 
-	{
-		"%{wks.location}/External/GLFW/lib-vc2022/",
-	}
 
 	links
 	{
@@ -29,7 +25,6 @@ project "Renderer"
 		"External",
 		"Glad",
 		"GLFW",
-		"opengl32.lib",
 	}
 
 	files
@@ -39,13 +34,16 @@ project "Renderer"
 	}
 
 	filter "system:windows"
-		systemversion "latest"
-		staticruntime "off"
+			systemversion "latest"
+			staticruntime "off"
+			libdirs { "%{wks.location}/External/GLFW/lib-vc2022/" }
+			links { "opengl32.lib" }
+			defines { "GLFW_INCLUDE_NONE" }
 
-		defines
-		{
-			"GLFW_INCLUDE_NONE"
-		}
+	filter "system:linux"
+			pic "On"
+			links { "GL", "pthread", "dl", "X11" }
+			defines { "GLFW_INCLUDE_NONE" }
 
 	filter "configurations:Debug"
 		defines "DEBUG=1"

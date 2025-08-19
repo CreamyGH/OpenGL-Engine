@@ -18,11 +18,6 @@ project "Core"
 		"%{IncludeDir.spdlog}",
 	}
 
-	libdirs 
-	{
-		"%{wks.location}/External/GLFW/lib-vc2022/",
-	}
-
 	files
 	{
 		"src/**.h",
@@ -37,13 +32,14 @@ project "Core"
 	}
 
 	filter "system:windows"
-		systemversion "latest"
-		staticruntime "off"
+			systemversion "latest"
+			staticruntime "off"
+			libdirs { "%{wks.location}/External/GLFW/lib-vc2022/" }
+			defines { "GLFW_INCLUDE_NONE" }
 
-		defines
-		{
-			"GLFW_INCLUDE_NONE"
-		}
+	filter "system:linux"
+			pic "On"
+			defines { "GLFW_INCLUDE_NONE" }
 
 	filter "configurations:Debug"
 		defines "DEBUG=1"
