@@ -27,30 +27,54 @@ namespace ECS
 
 	protected:
         template<typename ComponentT>
-        void AttachOnConstructComponent(ComponentCallback<ComponentT> cb)
+        void OnComponentConstruct(entt::entity, ComponentT&) {}
+
+        template<typename ComponentT>
+        void OnComponentUpdate(entt::entity, ComponentT&) {}
+
+        template<typename ComponentT>
+        void OnComponentDestroy(entt::entity, ComponentT&) {}
+
+        template<typename ComponentT>
+        void AttachOnConstructComponent() 
         {
-            m_Registry->on_construct<ComponentT>().connect([cb](entt::registry& reg, entt::entity e)
-            {
-                cb(e, reg.get<ComponentT>(e));
-            });
+            m_Registry->on_construct<ComponentT>()
+                .connect<&System::OnConstructAdapter<ComponentT>>(this);
         }
 
         template<typename ComponentT>
-        void AttachOnUpdateComponent(ComponentCallback<ComponentT> cb)
+        void AttachOnUpdateComponent() 
         {
-            m_Registry->on_update<ComponentT>().connect([cb](entt::registry& reg, entt::entity e)
-            {
-                cb(e, reg.get<ComponentT>(e));
-            });
+            m_Registry->on_update<ComponentT>()
+                .connect<&System::OnUpdateAdapter<ComponentT>>(this);
         }
 
         template<typename ComponentT>
-        void AttachOnDestroyComponent(ComponentCallback<ComponentT> cb)
+        void AttachOnDestroyComponent() 
         {
-            m_Registry->on_destroy<ComponentT>().connect([cb](entt::registry& reg, entt::entity e)
-            {
-                cb(e, reg.get<ComponentT>(e));
-            });
+            m_Registry->on_destroy<ComponentT>()
+                .connect<&System::OnDestroyAdapter<ComponentT>>(this);
+        }
+
+        template<typename ComponentT>
+        void OnConstructAdapter(entt::registry& reg, entt::entity e) 
+        {
+            auto& comp = reg.get<ComponentT>(e);
+            OnComponentConstruct(e, comp);
+        }
+
+        template<typename ComponentT>
+        void OnUpdateAdapter(entt::registry& reg, entt::entity e) 
+        {
+            auto& comp = reg.get<ComponentT>(e);
+            OnComponentUpdate(e, comp);
+        }
+
+        template<typename ComponentT>
+        void OnDestroyAdapter(entt::registry& reg, entt::entity e) 
+        {
+            auto& comp = reg.get<ComponentT>(e);
+            OnComponentDestroy(e, comp);
         }
 
     protected:

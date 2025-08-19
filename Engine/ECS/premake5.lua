@@ -11,7 +11,11 @@ project "ECS"
 	{
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}",
 		"%{wks.location}/Engine/Core/src",
+		"%{wks.location}/Engine/Renderer/src",
+		"%{wks.location}/Engine/ECS/src",
 	}
 
 	files
@@ -22,7 +26,11 @@ project "ECS"
 
     links
 	{
+		"Core",
+		"Renderer",
 		"External",
+		"Glad",
+		"GLFW",
 	}
 
 	filter "system:windows"

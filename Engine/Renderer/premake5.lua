@@ -24,11 +24,11 @@ project "Renderer"
 
 	links
 	{
-		"GLFW",
-		"Glad",
-		"External",
 		"Assets",
 		"Core",
+		"External",
+		"Glad",
+		"GLFW",
 		"opengl32.lib",
 	}
 

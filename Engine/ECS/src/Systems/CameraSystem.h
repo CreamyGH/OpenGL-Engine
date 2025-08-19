@@ -9,7 +9,11 @@ namespace ECS
 	{
 	public:
 		void OnSystemCreate() override;		
-		void OnUpdateCamera(entt::entity entity, CameraComponent& camera);
 		void ModifyFrameData(FrameData& frameData) override;
+
+	protected:
+		using System::OnComponentUpdate;
+
+		void OnComponentUpdate(entt::entity entity, CameraComponent& camera);
 	};
 }
