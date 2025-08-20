@@ -24,12 +24,12 @@ project "Sandbox"
     defines { "_CRT_SECURE_NO_WARNINGS" }
 
     links {
-        "GLFW",
-        "Glad",
-        "Core",
-        "Renderer",
         "Assets",
+        "Renderer",
+        "Core",
         "External",
+        "Glad",
+        "GLFW",
     }
 
     filter "system:windows"
@@ -70,7 +70,7 @@ project "Sandbox"
         postbuildcommands {
             '{COPYDIR} "%{wks.location}/Runtime/%{prj.name}/Resources" "%{cfg.targetdir}/Resources"',
             '{COPYFILE} "%{wks.location}/External/assimp/bin/linux/libassimp.so.5" "%{cfg.targetdir}/libassimp.so.5"',
-            '{COPYFILE} "%{wks.location}/External/assimp/bin/linux/libassimp.so" "%{cfg.targetdir}/libassimp.so"'
+            --'{COPYFILE} "%{wks.location}/External/assimp/bin/linux/libassimp.so" "%{cfg.targetdir}/libassimp.so"'
         }
 
     filter "configurations:Debug"

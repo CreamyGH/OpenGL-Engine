@@ -8,7 +8,7 @@ project "Core"
 	objdir    ("%{wks.location}/bin-int/" .. outputdir.. "/%{prj.name}")
 	
 	pchheader "pch.h"
-	pchsource "src/pch.cpp"
+	--pchsource "src/pch.cpp"
 
 	includedirs
 	{
@@ -16,6 +16,7 @@ project "Core"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.spdlog}",
+		"src",
 	}
 
 	files

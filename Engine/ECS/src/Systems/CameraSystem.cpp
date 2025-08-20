@@ -4,7 +4,7 @@ namespace ECS
 {
     void CameraSystem::OnSystemCreate()
     {
-        AttachOnUpdateComponent<CameraComponent>();
+        //AttachOnUpdateComponent<CameraComponent>();
     }
     
     
@@ -13,8 +13,8 @@ namespace ECS
         //TODO pass data to framedata
     }
 
-    void CameraSystem::OnComponentUpdate(entt::entity entity, CameraComponent &camera)
-    {
-        //TODO calculate view proj matrix
-    }
+    // void CameraSystem::OnComponentUpdate(entt::entity entity, CameraComponent &camera)
+    // {
+    //     //TODO calculate view proj matrix
+    // }
 }
