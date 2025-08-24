@@ -6,8 +6,8 @@ int main()
 	Core::WindowConfig winConfig;
 
 	winConfig.title = "OpenGL-Engine - Sandbox";
-	winConfig.width = 1920;
-	winConfig.height = 1080;
+	winConfig.width = 800;
+	winConfig.height = 600;
 	winConfig.vSyncEnabled = true;
 
 	std::unique_ptr<SandboxApp> app = std::make_unique<SandboxApp>();

@@ -16,7 +16,7 @@ void SandboxApp::OnCreate()
 
 void SandboxApp::OnUpdate(Timestep timestep)
 {
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClearColor(0.5f, 0.1f, 0.5f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	//LOG_INFO("XY: {0},{1}", m_Input.GetMouseX(), m_Input.GetMouseY());

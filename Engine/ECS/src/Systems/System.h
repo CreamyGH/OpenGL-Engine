@@ -36,45 +36,42 @@ namespace ECS
         void OnComponentDestroy(entt::entity, ComponentT&) {}
 
         template<typename ComponentT>
-        void AttachOnConstructComponent() 
-        {
+        void AttachOnConstructComponent() {
             m_Registry->on_construct<ComponentT>()
-                .connect<&System::OnConstructAdapter<ComponentT>>(this);
+                .template connect<&System::OnConstructAdapter<ComponentT>>(*this);
         }
 
         template<typename ComponentT>
-        void AttachOnUpdateComponent() 
-        {
+        void AttachOnUpdateComponent() {
             m_Registry->on_update<ComponentT>()
-                .connect<&System::OnUpdateAdapter<ComponentT>>(this);
+                .template connect<&System::OnUpdateAdapter<ComponentT>>(*this);
         }
 
         template<typename ComponentT>
-        void AttachOnDestroyComponent() 
-        {
+        void AttachOnDestroyComponent() {
             m_Registry->on_destroy<ComponentT>()
-                .connect<&System::OnDestroyAdapter<ComponentT>>(this);
+                .template connect<&System::OnDestroyAdapter<ComponentT>>(*this);
         }
 
         template<typename ComponentT>
         void OnConstructAdapter(entt::registry& reg, entt::entity e) 
         {
             auto& comp = reg.get<ComponentT>(e);
-            OnComponentConstruct(e, comp);
+            this->OnComponentConstruct(e, comp);
         }
 
         template<typename ComponentT>
         void OnUpdateAdapter(entt::registry& reg, entt::entity e) 
         {
             auto& comp = reg.get<ComponentT>(e);
-            OnComponentUpdate(e, comp);
+            this->OnComponentUpdate(e, comp);
         }
 
         template<typename ComponentT>
         void OnDestroyAdapter(entt::registry& reg, entt::entity e) 
         {
             auto& comp = reg.get<ComponentT>(e);
-            OnComponentDestroy(e, comp);
+            this->OnComponentDestroy(e, comp);
         }
 
     protected:

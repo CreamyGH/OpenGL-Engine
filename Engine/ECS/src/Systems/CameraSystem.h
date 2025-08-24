@@ -12,8 +12,8 @@ namespace ECS
 		void ModifyFrameData(FrameData& frameData) override;
 
 	protected:
-		//using System::OnComponentUpdate;
+		using System::OnComponentUpdate;
 
-		//void OnComponentUpdate(entt::entity entity, CameraComponent& camera);
+		void OnComponentUpdate(entt::entity entity, CameraComponent& camera);
 	};
 }
