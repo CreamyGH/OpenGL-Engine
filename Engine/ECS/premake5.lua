@@ -13,6 +13,7 @@ project "ECS"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
+		"%{IncludeDir.spdlog}",
 		"%{wks.location}/Engine/Core/src",
 		"%{wks.location}/Engine/Renderer/src",
 		"%{wks.location}/Engine/ECS/src",

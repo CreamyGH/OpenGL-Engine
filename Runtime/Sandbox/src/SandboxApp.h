@@ -3,6 +3,9 @@
 
 #include "Events/EventManager.h"
 
+#include "Systems/SystemManager.h"
+#include "Systems/CameraSystem.h"
+
 class SandboxApp : public Core::Application
 {
 public:
@@ -12,7 +15,7 @@ public:
 	void OnUpdate(Core::Timestep timestep) override;
 	void OnDestroy() override;
 
-
 private:
 	Core::Input& m_Input = Core::Input::get();
+	ECS::SystemManager& m_SystemManager = ECS::SystemManager::get();
 };

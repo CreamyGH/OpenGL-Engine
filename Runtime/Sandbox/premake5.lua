@@ -16,9 +16,11 @@ project "Sandbox"
         "%{IncludeDir.Glad}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.spdlog}",
+        "%{IncludeDir.entt}",
         "%{wks.location}/Engine/Core/src",
         "%{wks.location}/Engine/Renderer/src",
         "%{wks.location}/Engine/Assets/src",
+        "%{wks.location}/Engine/ECS/src",
     }
 
     defines { "_CRT_SECURE_NO_WARNINGS" }
@@ -26,6 +28,7 @@ project "Sandbox"
     links {
         "Assets",
         "Renderer",
+        "ECS",
         "Core",
         "External",
         "Glad",

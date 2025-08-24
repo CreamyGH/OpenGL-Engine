@@ -11,18 +11,21 @@ project "Assets"
 	{
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
+		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.assimp}",
 		"%{wks.location}/External/assimp/include",
 		"%{wks.location}/Engine/Core/src",
 		"%{wks.location}/Engine/Assets/src",
+		"%{wks.location}/Engine/Renderer/src",
 	}
 
 	links
 	{
 		"Core",
 		"External",
+		"Renderer",
 		"Glad",
 		"GLFW",
 	}
