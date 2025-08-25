@@ -5,8 +5,6 @@
 #include "Helpers/Singleton.h"
 #include "Timestep.h"
 
-//TODO create and publish component events
-
 namespace ECS
 {
 	class SystemManager : public Singleton<SystemManager>
@@ -18,7 +16,9 @@ namespace ECS
 		{
 			for (size_t order = 0; order < m_SystemsByOrder.size(); order++)
 			{
+				m_SystemsByOrder[order]->OnSystemEndScene();
 				m_SystemsByOrder[order]->SetActiveRegistry(activeRegistry);
+				m_SystemsByOrder[order]->OnSystemBeginScene();
 			}
 		}
 
@@ -32,6 +32,7 @@ namespace ECS
 
 			system->SetActiveRegistry(activeRegistry);
 			system->OnSystemCreate();
+			system->OnSystemBeginScene();
 
 			m_SystemsByOrder.emplace(execOrder, std::move(system));
 		}

@@ -10,7 +10,8 @@ namespace ECS
 	class CameraSystem : public System
 	{
 	public:
-		void OnSystemCreate() override;
+		void OnSystemBeginScene() override;
+		void OnSystemEndScene() override;
 		void ModifyFrameData(FrameData& frameData) override;
 
 		SYSTEM_EXEC_ORDER(0)

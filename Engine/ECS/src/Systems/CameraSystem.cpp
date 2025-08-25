@@ -2,12 +2,16 @@
 
 namespace ECS
 {
-    void CameraSystem::OnSystemCreate()
+    void CameraSystem::OnSystemBeginScene()
     {
-        AttachOnConstructComponent<CameraComponent>();
-        AttachOnUpdateComponent<CameraComponent>();
+        AttachAll<CameraComponent>();
     }
-        
+
+    void CameraSystem::OnSystemEndScene()
+    {
+        DetachAll<CameraComponent>();
+    }
+
     void CameraSystem::ModifyFrameData(FrameData &frameData)
     {
         //TODO pass data to framedata
@@ -17,9 +21,9 @@ namespace ECS
     {
         LOG_INFO("Camera constructed");
     }
-    
+
     void CameraSystem::OnComponentUpdate(entt::registry &registry, entt::entity entity)
     {
-
+        //TODO calculate view and projection matrices
     }
 }
