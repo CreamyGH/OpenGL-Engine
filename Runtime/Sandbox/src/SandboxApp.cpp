@@ -13,11 +13,11 @@ void SandboxApp::OnCreate()
 	//EVENT_LOG_CATEGORY(EventCategories::Window);
 	//m_EventManager.AddListenerFunc<KeyTypedEvent>(BIND_EVENT_FN(KeyPressed));
 
-	entt::registry registry;
-	m_SystemManager.RegisterSystem<CameraSystem>(&registry);
+// 	entt::registry registry;
+// 	m_SystemManager.RegisterSystem<CameraSystem>(&registry);
 
-	entt::entity e = registry.create();
-	registry.emplace<CameraComponent>(e);
+// 	entt::entity e = registry.create();
+// 	registry.emplace<CameraComponent>(e);
 }
 
 void SandboxApp::OnUpdate(Timestep timestep)

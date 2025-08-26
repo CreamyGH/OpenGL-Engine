@@ -44,7 +44,8 @@ public:
     inline const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
     inline const std::vector<uint32_t>& GetIndices() const { return m_Indices; }
 
-    const VertexLayout& GetVertexLayout() const { return m_VertexLayout; }
+    inline const VertexLayout& GetVertexLayout() const { return m_VertexLayout; }
+    inline const std::vector<uint8_t>& GetRawVertices() const { return m_RawVertices; }
 
     void AttachMeshGPU(const MeshGPU& meshGPU);
     const MeshGPU& getMeshGPU() const;
