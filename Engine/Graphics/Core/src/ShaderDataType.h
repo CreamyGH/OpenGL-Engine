@@ -1,4 +1,4 @@
-#include <glad/glad.h>
+#pragma once
 
 enum class ShaderDataType 
 {
@@ -7,9 +7,10 @@ enum class ShaderDataType
     UByte4N,
 };
 
-inline GLsizei SizeOf(ShaderDataType t) 
+inline size_t SizeOf(ShaderDataType t) 
 {
-    switch(t){
+    switch(t)
+    {
         case ShaderDataType::Float:  return 4;
         case ShaderDataType::Float2: return 8;
         case ShaderDataType::Float3: return 12;
@@ -23,9 +24,10 @@ inline GLsizei SizeOf(ShaderDataType t)
     return 0;
 }
 
-inline GLint ComponentCount(ShaderDataType t)
+inline int ComponentCount(ShaderDataType t)
 {
-    switch(t){
+    switch(t)
+    {
         case ShaderDataType::Float:  return 1;
         case ShaderDataType::Float2: return 2;
         case ShaderDataType::Float3: return 3;
@@ -39,22 +41,6 @@ inline GLint ComponentCount(ShaderDataType t)
     return 0;
 }
 
-inline GLenum GLBaseType(ShaderDataType t)
-{
-    switch(t){
-        case ShaderDataType::Float:
-        case ShaderDataType::Float2:
-        case ShaderDataType::Float3:
-        case ShaderDataType::Float4: return GL_FLOAT;
-        case ShaderDataType::Int:
-        case ShaderDataType::Int2:
-        case ShaderDataType::Int3:
-        case ShaderDataType::Int4:   return GL_INT;
-        case ShaderDataType::UByte4N:return GL_UNSIGNED_BYTE;
-    }
-    return GL_FLOAT;
-}
-
-inline GLboolean IsNormalized(ShaderDataType t) {
-    return t == ShaderDataType::UByte4N ? GL_TRUE : GL_FALSE;
+inline bool IsNormalized(ShaderDataType t) {
+    return t == ShaderDataType::UByte4N ? true : false;
 }

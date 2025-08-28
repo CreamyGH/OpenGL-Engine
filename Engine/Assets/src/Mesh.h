@@ -7,9 +7,7 @@
 #include <glm/glm.hpp>
 
 #include "Log.h"
-
-#include "ShaderDataType.h"
-#include "MeshGPU.h"
+#include "VertexLayout.h"
 
 #define POSITION_LOCATION 0
 #define NORMAL_LOCATION 1
@@ -20,19 +18,6 @@ struct Vertex
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 uv;
-};
-
-struct VertexAttribute 
-{
-    uint32_t location;
-    ShaderDataType type;
-    uint32_t offset;
-};
-
-struct VertexLayout 
-{
-    uint32_t stride;      
-    std::vector<VertexAttribute> attribs;  
 };
 
 class Mesh
@@ -47,9 +32,6 @@ public:
     inline const VertexLayout& GetVertexLayout() const { return m_VertexLayout; }
     inline const std::vector<uint8_t>& GetRawVertices() const { return m_RawVertices; }
 
-    void AttachMeshGPU(const MeshGPU& meshGPU);
-    const MeshGPU& getMeshGPU() const;
-
 private:
     void SyncRawVertices();
     void SetVertexLayout();
@@ -60,7 +42,4 @@ private:
 
     std::vector<uint8_t> m_RawVertices;
     VertexLayout m_VertexLayout;
-
-    MeshGPU m_MeshGPU;
-    bool m_IsMeshGPUAttached = false;
 };

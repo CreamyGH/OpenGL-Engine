@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../BaseRenderer.h"
+#include <glad/glad.h>
+#include "BaseRenderer.h"
 
-class DirectRenderer : public Renderer
+class GLDirectRenderer : public Renderer
 {
 public:
     void BeginFrame(FrameData& frameData) override; //Send frame data to GPU and clear data
@@ -15,7 +16,7 @@ protected:
     void DeleteSSBOs() override;
 
 private:
-    ~DirectRenderer() override {};
+    ~GLDirectRenderer() override {};
 
 private:
     GLuint m_CameraUBO = 0;

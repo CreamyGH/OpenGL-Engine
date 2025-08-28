@@ -1,4 +1,4 @@
-project "Assets"
+project "GraphicsCore"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++20"
@@ -11,20 +11,15 @@ project "Assets"
 	{
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.assimp}",
-		"%{wks.location}/External/assimp/include",
-		"%{wks.location}/Engine/Assets/src",
+		"%{IncludeDir.spdlog}",
 		"%{wks.location}/Engine/Core/src",
-		"%{wks.location}/Engine/Graphics/Core/src"
 	}
+
 
 	links
 	{
 		"Core",
-		"GraphicsCore",
 		"External",
 		"Glad",
 		"GLFW",
@@ -39,11 +34,14 @@ project "Assets"
 	filter "system:windows"
 			systemversion "latest"
 			staticruntime "off"
+			libdirs { "%{wks.location}/External/GLFW/lib-vc2022/" }
 			links { "opengl32.lib" }
+			defines { "GLFW_INCLUDE_NONE" }
 
 	filter "system:linux"
 			pic "On"
 			links { "GL", "pthread", "dl", "X11" }
+			defines { "GLFW_INCLUDE_NONE" }
 
 	filter "configurations:Debug"
 		defines "DEBUG=1"

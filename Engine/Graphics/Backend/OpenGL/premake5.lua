@@ -1,4 +1,4 @@
-project "Renderer"
+project "BackendOpenGL"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++20"
@@ -15,6 +15,7 @@ project "Renderer"
 		"%{IncludeDir.spdlog}",
 		"%{wks.location}/Engine/Core/src",
 		"%{wks.location}/Engine/Assets/src",
+		"%{wks.location}/Engine/Graphics/Core/src",
 	}
 
 
@@ -22,6 +23,7 @@ project "Renderer"
 	{
 		"Assets",
 		"Core",
+		"GraphicsCore",
 		"External",
 		"Glad",
 		"GLFW",

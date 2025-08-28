@@ -18,7 +18,7 @@ project "Sandbox"
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.entt}",
         "%{wks.location}/Engine/Core/src",
-        "%{wks.location}/Engine/Renderer/src",
+        "%{wks.location}/Engine/Graphics/Core/src",
         "%{wks.location}/Engine/Assets/src",
         "%{wks.location}/Engine/ECS/src",
     }
@@ -27,7 +27,7 @@ project "Sandbox"
 
     links {
         "Assets",
-        "Renderer",
+        "GraphicsCore",
         "ECS",
         "Core",
         "External",

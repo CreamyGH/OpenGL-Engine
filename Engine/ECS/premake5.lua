@@ -14,9 +14,10 @@ project "ECS"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.spdlog}",
-		"%{wks.location}/Engine/Core/src",
-		"%{wks.location}/Engine/Renderer/src",
 		"%{wks.location}/Engine/ECS/src",
+		"%{wks.location}/Engine/Core/src",
+		"%{wks.location}/Engine/Graphics/Core/src",
+		"%{wks.location}/Engine/Assets/src"
 	}
 
 	files
@@ -28,7 +29,8 @@ project "ECS"
     links
 	{
 		"Core",
-		"Renderer",
+		"GraphicsCore",
+		"Assets",
 		"External",
 		"Glad",
 		"GLFW",
