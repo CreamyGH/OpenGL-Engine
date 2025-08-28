@@ -15,24 +15,20 @@ public:
     inline void Execute(FrameData& frameData)
     {
         BindFrameBuffer();
-        //TODO ApplyPipelineState(state)
         DrawFrame(frameData);
         UnBindFrameBuffer();
     }
 
 protected:
-    virtual void SetupFBOAttachments(int width, int height) {}
     virtual void DrawFrame(FrameData& frameData) = 0;
+    virtual void SetupFBOAttachments(int width, int height) {}
 
-protected:
-    GLuint m_FBO = 0; //default back buffer
-
+    virtual void GenerateFrameBuffer() {}
+    virtual void DeleteFrameBuffer() {}
+    
+    virtual void BindFrameBuffer() {};
+    virtual void UnBindFrameBuffer() {};
+    
 private:
-    void GenerateFrameBuffer();
-    void DeleteFrameBuffer();
     bool OnResize(Core::WindowResizeEvent& event);
-
-    void BindFrameBuffer();
-    void UnBindFrameBuffer();
-    void ApplyPipelineState(const PipelineState& state);
 };

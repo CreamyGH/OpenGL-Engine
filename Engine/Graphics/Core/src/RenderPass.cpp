@@ -18,32 +18,6 @@ bool RenderPass::OnResize(Core::WindowResizeEvent &event)
     return false;
 }   
 
-void RenderPass::GenerateFrameBuffer() {
-    glGenFramebuffers(1, &m_FBO);
-}
-
-
-void RenderPass::DeleteFrameBuffer() {
-    glDeleteFramebuffers(1, &m_FBO);
-}
-
-
-void RenderPass::BindFrameBuffer() 
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-    LOG_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Frame buffer failed to bind");
-}
-
-
-void RenderPass::UnBindFrameBuffer() {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void RenderPass::ApplyPipelineState(const PipelineState &state)
-{
-    //TODO
-}
-
 RenderPass::~RenderPass()
 {
     DeleteFrameBuffer();

@@ -1,5 +1,6 @@
 #pragma once
 #include <spdlog/spdlog.h>
+#include <csignal>
 
 namespace Core
 {
@@ -18,8 +19,15 @@ namespace Core
     #define LOG_ENABLE_ASSERTS
 #endif
 
+#ifdef _MSC_VER
+    #define LOG_DEBUGBREAK() __debugbreak()
+#else
+    #define LOG_DEBUGBREAK() raise(SIGTRAP)
+#endif
+
 #ifdef LOG_ENABLE_ASSERTS
-    #define LOG_ASSERT(x, ...) { if(!(x)) { LOG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+    #define LOG_ASSERT(x, ...) \
+        { if(!(x)) { LOG_ERROR("Assertion Failed: {0}", __VA_ARGS__); LOG_DEBUGBREAK(); } }
 #else
     #define LOG_ASSERT(x, ...)
 #endif

@@ -13,9 +13,11 @@ project "ECS"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{wks.location}/Engine/Core/src",
-		"%{wks.location}/Engine/Renderer/src",
+		"%{IncludeDir.spdlog}",
 		"%{wks.location}/Engine/ECS/src",
+		"%{wks.location}/Engine/Core/src",
+		"%{wks.location}/Engine/Graphics/Core/src",
+		"%{wks.location}/Engine/Assets/src"
 	}
 
 	files
@@ -27,15 +29,19 @@ project "ECS"
     links
 	{
 		"Core",
-		"Renderer",
+		"GraphicsCore",
+		"Assets",
 		"External",
 		"Glad",
 		"GLFW",
 	}
 
 	filter "system:windows"
-		systemversion "latest"
-		staticruntime "off"
+			systemversion "latest"
+			staticruntime "off"
+
+	filter "system:linux"
+			pic "On"
 
 	filter "configurations:Debug"
 		defines "DEBUG=1"

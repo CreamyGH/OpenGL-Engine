@@ -4,14 +4,20 @@
 #include <glad/glad.h>
 
 using namespace Core;
+using namespace ECS;
 
 void SandboxApp::OnCreate()
 {
-	LOG_INFO("Created sandboxApp");
+	LOG_INFO("Created SandboxApp");
 
-	EVENT_LOG_CATEGORY(EventCategories::Window);
-
+	//EVENT_LOG_CATEGORY(EventCategories::Window);
 	//m_EventManager.AddListenerFunc<KeyTypedEvent>(BIND_EVENT_FN(KeyPressed));
+
+// 	entt::registry registry;
+// 	m_SystemManager.RegisterSystem<CameraSystem>(&registry);
+
+// 	entt::entity e = registry.create();
+// 	registry.emplace<CameraComponent>(e);
 }
 
 void SandboxApp::OnUpdate(Timestep timestep)
@@ -29,5 +35,5 @@ void SandboxApp::OnUpdate(Timestep timestep)
 
 void SandboxApp::OnDestroy()
 {
-	LOG_INFO("Destroyed sandboxApp");
+	LOG_INFO("Destroyed SandboxApp");
 }

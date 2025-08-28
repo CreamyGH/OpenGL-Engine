@@ -1,19 +1,23 @@
 #pragma once
+#include "Log.h"
 #include "System.h"
 
 #include "Components/CameraComponent.h"
+
 
 namespace ECS
 {
 	class CameraSystem : public System
 	{
 	public:
-		void OnSystemCreate() override;		
+		void OnSystemBeginScene() override;
+		void OnSystemEndScene() override;
 		void ModifyFrameData(FrameData& frameData) override;
 
+		SYSTEM_EXEC_ORDER(0)
+		
 	protected:
-		using System::OnComponentUpdate;
-
-		void OnComponentUpdate(entt::entity entity, CameraComponent& camera);
+		void OnComponentConstruct(entt::registry& registry, entt::entity entity) override;
+		void OnComponentUpdate(entt::registry& registry, entt::entity entity) override;
 	};
 }

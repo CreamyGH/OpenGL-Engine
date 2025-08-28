@@ -7,77 +7,66 @@
 
 namespace ECS
 {
-	#define SYSTEM_EXEC_ORDER(order) virtual uint32_t GetExecOrded() const override { return order; }
-    #define BIND_COMP_FN(ComponentT, method) \
-    [this](entt::entity e, ComponentT& comp) { this->method(e, comp); }
-
-    template<typename ComponentT>
-    using ComponentCallback = std::function<void(entt::entity, ComponentT&)>;
+	#define SYSTEM_EXEC_ORDER(order) virtual uint32_t GetExecOrder() const override { return order; }
 
 	class System
 	{
 	public:
+        virtual ~System() = default;
+
 		inline void SetActiveRegistry(entt::registry* activeRegistry) { m_Registry = activeRegistry; }
+
 		virtual void OnSystemCreate() {}
 		virtual void OnSystemDestroy() {}
 
+        virtual void OnSystemBeginScene() {}
+        virtual void OnSystemEndScene() {}
+
 		virtual void ModifyFrameData(FrameData& frameData) {}
 
-		virtual uint32_t GetExecOrded() const = 0;
+		virtual uint32_t GetExecOrder() const = 0;
 
 	protected:
-        template<typename ComponentT>
-        void OnComponentConstruct(entt::entity, ComponentT&) {}
+        virtual void OnComponentConstruct(entt::registry& registry, entt::entity entity) {}
+        virtual void OnComponentUpdate(entt::registry& registry, entt::entity entity) {}
+        virtual void OnComponentDestroy(entt::registry& registry, entt::entity entity) {}
 
-        template<typename ComponentT>
-        void OnComponentUpdate(entt::entity, ComponentT&) {}
-
-        template<typename ComponentT>
-        void OnComponentDestroy(entt::entity, ComponentT&) {}
-
-        template<typename ComponentT>
-        void AttachOnConstructComponent() 
-        {
-            m_Registry->on_construct<ComponentT>()
-                .connect<&System::OnConstructAdapter<ComponentT>>(this);
+        
+        template<typename... Components>
+        void AttachAll() {
+            (AttachAllFor<Components>(), ...);
         }
 
-        template<typename ComponentT>
-        void AttachOnUpdateComponent() 
-        {
-            m_Registry->on_update<ComponentT>()
-                .connect<&System::OnUpdateAdapter<ComponentT>>(this);
+        template<typename... Components>
+        void DetachAll() {
+            (DetachAllFor<Components>(), ...);
         }
-
-        template<typename ComponentT>
-        void AttachOnDestroyComponent() 
-        {
-            m_Registry->on_destroy<ComponentT>()
-                .connect<&System::OnDestroyAdapter<ComponentT>>(this);
-        }
-
-        template<typename ComponentT>
-        void OnConstructAdapter(entt::registry& reg, entt::entity e) 
-        {
-            auto& comp = reg.get<ComponentT>(e);
-            OnComponentConstruct(e, comp);
-        }
-
-        template<typename ComponentT>
-        void OnUpdateAdapter(entt::registry& reg, entt::entity e) 
-        {
-            auto& comp = reg.get<ComponentT>(e);
-            OnComponentUpdate(e, comp);
-        }
-
-        template<typename ComponentT>
-        void OnDestroyAdapter(entt::registry& reg, entt::entity e) 
-        {
-            auto& comp = reg.get<ComponentT>(e);
-            OnComponentDestroy(e, comp);
-        }
-
+        
     protected:
         entt::registry* m_Registry = nullptr;
+        
+    private:
+        template<typename ComponentT>
+        void AttachAllFor() 
+        {
+            LOG_ASSERT(m_Registry, "Registry not set");
+            m_Registry->on_construct<ComponentT>()
+                .template connect<&System::OnComponentConstruct>(*this);
+
+            m_Registry->on_update<ComponentT>()
+                .template connect<&System::OnComponentUpdate>(*this);
+
+            m_Registry->on_destroy<ComponentT>()
+                .template connect<&System::OnComponentDestroy>(*this);
+        }
+
+        template<typename ComponentT>
+        void DetachAllFor() 
+        {
+            LOG_ASSERT(m_Registry, "Registry not set");
+            m_Registry->on_construct<ComponentT>().disconnect(this);
+            m_Registry->on_update<ComponentT>().disconnect(this);
+            m_Registry->on_destroy<ComponentT>().disconnect(this);
+        }
 	};
 }

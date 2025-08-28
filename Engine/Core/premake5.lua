@@ -8,7 +8,7 @@ project "Core"
 	objdir    ("%{wks.location}/bin-int/" .. outputdir.. "/%{prj.name}")
 	
 	pchheader "pch.h"
-	pchsource "src/pch.cpp"
+	--pchsource "src/pch.cpp"
 
 	includedirs
 	{
@@ -16,11 +16,7 @@ project "Core"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.spdlog}",
-	}
-
-	libdirs 
-	{
-		"%{wks.location}/External/GLFW/lib-vc2022/",
+		"src",
 	}
 
 	files
@@ -37,13 +33,14 @@ project "Core"
 	}
 
 	filter "system:windows"
-		systemversion "latest"
-		staticruntime "off"
+			systemversion "latest"
+			staticruntime "off"
+			libdirs { "%{wks.location}/External/GLFW/lib-vc2022/" }
+			defines { "GLFW_INCLUDE_NONE" }
 
-		defines
-		{
-			"GLFW_INCLUDE_NONE"
-		}
+	filter "system:linux"
+			pic "On"
+			defines { "GLFW_INCLUDE_NONE" }
 
 	filter "configurations:Debug"
 		defines "DEBUG=1"
