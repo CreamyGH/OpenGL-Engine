@@ -11,8 +11,6 @@ project "ECS"
 	{
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}",
 		"%{IncludeDir.spdlog}",
 		"%{wks.location}/Engine/ECS/src",
 		"%{wks.location}/Engine/Core/src",
@@ -28,12 +26,10 @@ project "ECS"
 
     links
 	{
-		"Core",
-		"GraphicsCore",
 		"Assets",
+		"GraphicsCore",
+		"Core",
 		"External",
-		"Glad",
-		"GLFW",
 	}
 
 	filter "system:windows"

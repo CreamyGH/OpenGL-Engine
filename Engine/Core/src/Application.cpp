@@ -6,8 +6,10 @@ namespace Core
 	void Application::Init(const WindowConfig& winConfig)
 	{
 		Log::Init();
+
 		m_Window = std::make_shared<Window>(winConfig);
-		Input::get().Init(m_Window->getHandle());
+
+		Input::get().Init(m_Window->getHandle());		
 	}
 
 	void Application::Run()

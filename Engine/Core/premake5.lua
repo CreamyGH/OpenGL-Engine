@@ -13,10 +13,9 @@ project "Core"
 	includedirs
 	{
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.spdlog}",
-		"src",
+		"%{wks.location}/Engine/Core/src",
 	}
 
 	files
@@ -27,9 +26,8 @@ project "Core"
 
     links
 	{
-		"GLFW",
-		"Glad",
 		"External",
+		"GLFW",
 	}
 
 	filter "system:windows"
