@@ -19,6 +19,7 @@ project "Sandbox"
         "%{IncludeDir.entt}",
         "%{wks.location}/Engine/Core/src",
         "%{wks.location}/Engine/Graphics/Core/src",
+        "%{wks.location}/Engine/Graphics/Backend/OpenGL/src",
         "%{wks.location}/Engine/Assets/src",
         "%{wks.location}/Engine/ECS/src",
     }
@@ -27,8 +28,9 @@ project "Sandbox"
 
     links {
         "Assets",
-        "GraphicsCore",
         "ECS",
+        "OpenGLBackend",
+        "GraphicsCore",
         "Core",
         "External",
         "Glad",

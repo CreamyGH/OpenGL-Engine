@@ -9,10 +9,9 @@ project "GraphicsCore"
 	
 	includedirs
 	{
-		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.spdlog}",
+		"%{wks.location}/Engine/Graphics/Core/src",
 		"%{wks.location}/Engine/Core/src",
 	}
 
@@ -21,8 +20,6 @@ project "GraphicsCore"
 	{
 		"Core",
 		"External",
-		"Glad",
-		"GLFW",
 	}
 
 	files
@@ -34,14 +31,9 @@ project "GraphicsCore"
 	filter "system:windows"
 			systemversion "latest"
 			staticruntime "off"
-			libdirs { "%{wks.location}/External/GLFW/lib-vc2022/" }
-			links { "opengl32.lib" }
-			defines { "GLFW_INCLUDE_NONE" }
 
 	filter "system:linux"
 			pic "On"
-			links { "GL", "pthread", "dl", "X11" }
-			defines { "GLFW_INCLUDE_NONE" }
 
 	filter "configurations:Debug"
 		defines "DEBUG=1"

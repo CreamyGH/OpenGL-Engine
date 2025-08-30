@@ -1,4 +1,4 @@
-project "BackendOpenGL"
+project "OpenGLBackend"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++20"
@@ -13,15 +13,14 @@ project "BackendOpenGL"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.spdlog}",
-		"%{wks.location}/Engine/Core/src",
-		"%{wks.location}/Engine/Assets/src",
+		"%{wks.location}/Engine/Graphics/Backend/OpenGL/src",
 		"%{wks.location}/Engine/Graphics/Core/src",
+		"%{wks.location}/Engine/Core/src",
 	}
 
 
 	links
 	{
-		"Assets",
 		"Core",
 		"GraphicsCore",
 		"External",
