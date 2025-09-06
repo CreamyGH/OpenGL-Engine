@@ -16,10 +16,12 @@ project "Assets"
 		"%{wks.location}/External/assimp/include",
 		"%{wks.location}/Engine/Assets/src",
 		"%{wks.location}/Engine/Core/src",
+		"%{wks.location}/Engine/Graphics/Core/src",
 	}
 
 	links
 	{
+		"GraphicsCore",
 		"Core",
 		"External",
 		"Glad",

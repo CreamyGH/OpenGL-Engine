@@ -10,13 +10,6 @@
 class GLBackend : public Backend
 {
 public:
-    const std::unique_ptr<MeshUploader> GetMeshUploader() override
-    {
-        std::unique_ptr<MeshUploader> meshUploader = std::make_unique<GLMeshUploader>();
-        return meshUploader;
-    }
-
-protected:
     void InitBackend() override
     {
         int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);

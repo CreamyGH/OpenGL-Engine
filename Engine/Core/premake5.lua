@@ -8,7 +8,6 @@ project "Core"
 	objdir    ("%{wks.location}/bin-int/" .. outputdir.. "/%{prj.name}")
 	
 	pchheader "pch.h"
-	--pchsource "src/pch.cpp"
 
 	includedirs
 	{
@@ -31,6 +30,7 @@ project "Core"
 	}
 
 	filter "system:windows"
+			pchsource "src/pch.cpp"
 			systemversion "latest"
 			staticruntime "off"
 			libdirs { "%{wks.location}/External/GLFW/lib-vc2022/" }

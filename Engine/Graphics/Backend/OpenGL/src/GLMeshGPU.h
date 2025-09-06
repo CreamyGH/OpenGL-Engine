@@ -1,18 +1,21 @@
 #pragma once
 
+#include "Log.h"
+
 #include <glad/glad.h>
 #include "MeshGPU.h"
 
 struct GLMeshGPU : public MeshGPU
 {
-    void Bind() override
+    void Bind()
     {
-        //TODO
+        LOG_ASSERT(vao != 0, "This mesh was not uploaded");
+        glBindVertexArray(vao);
     }
 
-    void UnBind() override
+    void UnBind()
     {
-        //TODO
+        glBindVertexArray(0);
     }
 
     GLuint vbo = 0;

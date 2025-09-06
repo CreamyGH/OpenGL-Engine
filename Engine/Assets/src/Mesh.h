@@ -32,6 +32,9 @@ public:
     inline const VertexLayout& GetVertexLayout() const { return m_VertexLayout; }
     inline const std::vector<uint8_t>& GetRawVertices() const { return m_RawVertices; }
 
+    inline void ReleaseRawVertices() { m_RawVertices.clear(); }
+    inline bool HasRawVertices() const { !m_RawVertices.empty(); }
+
 private:
     void SyncRawVertices();
     void SetVertexLayout();
