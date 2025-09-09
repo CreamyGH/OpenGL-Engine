@@ -1,56 +1,20 @@
 # OpenGL-Engine
 
-**OpenGL-Engine** is my **hobby project** written in **C++** – a graphics engine built with an **Entity Component System (ECS)** architecture.  
-This project is primarily for **fun, learning, and self-improvement**, and also to serve as a part of my portfolio.  
-⚠️ This is **not meant to be a production-ready engine** for mass use. Instead, it's a playground for experimenting with engine architecture, rendering backends, and graphics programming.
+**OpenGL-Engine** is my **hobby project** written in **C++ 20** and **OpenGL 4.6** – a game engine built with an **Entity Component System (ECS)** architecture.  
+This project is primarily for **fun, learning, and self-improvement**.  
 
 ---
 
 ## Features
-- Entity Component System (ECS) architecture,  
-- Backend system already in place → future support for multiple graphics APIs,  
-- Currently supports **OpenGL**,  
-- Written in modern **C++**,  
-- Build system powered by **Premake5**.  
+- Entity Component System (ECS) architecture,
+- Backend system already in place → future support for multiple graphics APIs,
+- Currently supports **OpenGL 4.6**,
+- Written in  **C++ 20**,
+- Build system powered by **Premake5**.
+
 ---
 
 ## Building the Project
-
-### 🔹 Linux
-
-**Requirements:**
-- C++ compiler (`g++` or `clang++`),  
-- `make`,  
-- [Premake5](https://premake.github.io/),  
-- Git.  
-
-**Steps:**
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/OpenGL-Engine.git
-   cd OpenGL-Engine
-   ```
-
-2. Generate Makefiles with Premake5:
-
-   ```bash
-   premake5 gmake2
-   ```
-
-3. Build the project:
-
-   ```bash
-   make
-   ```
-
-4. Run the executable (inside `bin/` folder):
-
-   ```bash
-   ./bin/Debug/OpenGL-Engine
-   ```
-
-   *(Path may vary depending on your build configuration)*
----
 
 ### 🔹 Windows
 
@@ -58,7 +22,6 @@ This project is primarily for **fun, learning, and self-improvement**, and also 
 
 * [Visual Studio](https://visualstudio.microsoft.com/) (2019 or newer recommended),
 * [Premake5](https://premake.github.io/),
-* Git.
 
 **Steps:**
 
@@ -83,17 +46,46 @@ This project is primarily for **fun, learning, and self-improvement**, and also 
 
 ---
 
+### 🔹 Linux
+
+**Requirements:**
+- C++ compiler (`g++` or `clang++`),  
+- `make`,  
+- [Premake5](https://premake.github.io/),
+
+**Steps:**
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/OpenGL-Engine.git
+   cd OpenGL-Engine
+   ```
+
+2. Generate Makefiles with Premake5:
+
+   ```bash
+   premake5 gmake2
+   ```
+
+3. Build the project:
+
+   ```bash
+   make
+   ```
+
+4. Run the executable (inside `bin/` folder)
+
+---
+
 ## Project Status
 
-👉 This is a **purely hobby project** created for learning purposes.
-I'm not aiming for this to be a widely used engine, but rather a **personal exploration of graphics programming, C++, and engine architecture**.
+👉 Right now I’m working on the **overall rendering architecture**, since the main focus at this stage is building a solid foundation for the engine.
 
 Future goals:
 
 * Scene editor,
+* Physics,
+* Networking (multiplayer),
 * Support for additional graphics APIs (e.g., Vulkan, DirectX),
-* Resource management improvements,
-* Developer tools (profiler, debug renderer).
 
 ---
 
