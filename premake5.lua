@@ -8,6 +8,13 @@ workspace "OpenGL-Engine"
 		"MultiProcessorCompile"
 	}
 
+	filter "action:vs*"
+        buildoptions { "/utf-8" }
+        characterset "Unicode"
+    
+	filter "action:gmake2"
+    	buildoptions { "-finput-charset=UTF-8", "-fexec-charset=UTF-8" }
+
 	outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 	IncludeDir = {}
