@@ -16,11 +16,20 @@ MeshHandle GLMeshUploader::CreateMeshHandle(const std::vector<uint8_t> &rawVerti
     return m_NextHandle - 1;
 }
 
+void GLMeshUploader::UpdateMeshHandle(MeshHandle oldHandle, const std::vector<uint8_t> &rawVertices, const std::vector<uint32_t> &indices, const VertexLayout &vertexLayout)
+{
+    GLMeshGPU* GLMesh = m_UploadedMeshes[oldHandle].get();
+
+    SetVBO(rawVertices, GLMesh);
+    SetEBO(indices, GLMesh);
+    SetVAO(vertexLayout, GLMesh);
+}
+
 void GLMeshUploader::ReleaseHandle(MeshHandle handle)
 {
     LOG_ASSERT(m_UploadedMeshes.contains(handle), "This mesh handle doesn't exist");
 
-    GLMeshGPU* GLMesh = m_UploadedMeshes[m_NextHandle].get();
+    GLMeshGPU* GLMesh = m_UploadedMeshes[handle].get();
 
     DeleteGLObjects(GLMesh);
     m_UploadedMeshes.erase(handle);

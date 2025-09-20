@@ -4,8 +4,8 @@
 
 enum class TextureSemantic 
 {
-    BaseColor, Diffuse, Specular, Normal, Metalness, Roughness, AO,
-    Emissive, Opacity, Height, Glossiness, Unknown
+    Unknown = 0, BaseColor, Diffuse, Specular, Normal, Metalness, Roughness, AO,
+    Emissive, Opacity, Height, Glossiness
 };
 
 enum class TextureFormat 
@@ -46,7 +46,7 @@ enum class Filter
 enum class Address 
 { 
     Repeat,
-    Clamp, 
+    Clamp,
     Mirror
 };
 
@@ -66,10 +66,4 @@ struct TextureViewDesc
 
     TextureFormat viewFormat;
     bool hasFormatOverride = false;
-};
-
-struct TextureBinding
-{
-    uint32_t set = 0;
-    uint32_t binding = 0;
 };

@@ -15,6 +15,8 @@ class GLMeshUploader : public MeshUploader
 {
 public:
     MeshHandle CreateMeshHandle(const std::vector<uint8_t>& rawVertices, const std::vector<uint32_t>& indices, const VertexLayout& vertexLayout) override;
+    void UpdateMeshHandle(MeshHandle oldHandle, const std::vector<uint8_t>& rawVertices, const std::vector<uint32_t>& indices, const VertexLayout& vertexLayout) override;
+
     void ReleaseHandle(MeshHandle handle) override;
 
     const GLMeshGPU* GetMeshGPU(MeshHandle handle) override { m_UploadedMeshes[handle].get(); }
