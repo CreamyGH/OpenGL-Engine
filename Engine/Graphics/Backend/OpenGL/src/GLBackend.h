@@ -4,7 +4,6 @@
 #include <GLFW/glfw3.h>
 
 #include "Backend.h"
-#include "GLMeshUploader.h"
 
 
 class GLBackend : public Backend

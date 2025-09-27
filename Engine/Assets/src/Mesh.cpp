@@ -1,18 +1,5 @@
 #include "Mesh.h"
 
-void Mesh::SetVertices(const std::vector<Vertex> vertices)
-{
-    m_Vertices = std::move(vertices);
-    SyncRawVertices();
-}
-
-
-void Mesh::SyncRawVertices()
-{
-    m_RawVertices.resize(m_Vertices.size() * sizeof(Vertex));
-    std::memcpy(m_RawVertices.data(), m_Vertices.data(), m_RawVertices.size());
-}
-
 void Mesh::SetVertexLayout()
 {
     m_VertexLayout.stride = sizeof(Vertex);
@@ -23,6 +10,4 @@ void Mesh::SetVertexLayout()
         {NORMAL_LOCATION, ShaderDataType::Float3, offsetof(Vertex, normal)},
         {UV_LOCATION, ShaderDataType::Float2, offsetof(Vertex, uv)}
     };
-
-
 }

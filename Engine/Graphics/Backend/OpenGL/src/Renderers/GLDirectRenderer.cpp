@@ -15,17 +15,7 @@ void GLDirectRenderer::EndFrame(FrameData &frameData)
 
 }
 
-void GLDirectRenderer::setupRenderQueue()
-{
-
-}
-
-void GLDirectRenderer::InitSSBOs()
-{
-
-}
-
-void GLDirectRenderer::DeleteSSBOs()
+void GLDirectRenderer::SetupRenderQueue()
 {
 
 }

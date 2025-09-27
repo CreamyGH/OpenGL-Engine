@@ -1,45 +1,20 @@
 #include "GLTextureUploader.h"
 
-TextureHandle GLTextureUploader::CreateTextureHandle(const std::vector<uint8_t> &pixelData, const TextureDesc &desc, const SamplerDesc &sampler, const TextureViewDesc &view)
+std::unique_ptr<TextureUploadData> GLTextureUploader::UploadTexture(const std::vector<uint8_t> &pixelData, const TextureDesc &desc, const SamplerDesc &sampler)
 {
-    m_UploadedTextures[m_NextHandle] = std::make_unique<GLTextureGPU>();
+    std::unique_ptr<GLTextureUploadData> texture = std::make_unique<GLTextureUploadData>();
+
+    GenerateGLObjects(texture.get(), desc.dimension);
+
+    SetTexture(pixelData, desc, texture.get());
+    SetSampler(sampler, texture.get());
     
-    GLTextureGPU* texture = m_UploadedTextures[m_NextHandle].get();
+    UpdateBindlessHandle(texture.get());
 
-    GenerateGLObjects(texture, desc.dimension);
-
-    SetTexture(pixelData, desc, texture);
-    SetSampler(sampler, texture);
-    
-    UpdateBindlessHandle(texture);
-
-    m_NextHandle++;
-    return m_NextHandle - 1;
+    return texture;
 }
 
-void GLTextureUploader::UpdateTextureHandle(TextureHandle oldHandle, const std::vector<uint8_t> &pixelData, const TextureDesc &desc, const SamplerDesc &sampler, const TextureViewDesc &view)
-{    
-    GLTextureGPU* texture = m_UploadedTextures[oldHandle].get();
-
-    SetTexture(pixelData, desc, texture);
-    SetSampler(sampler, texture);
-    
-    ClearBindlessHandle(texture);
-    UpdateBindlessHandle(texture);
-}
-
-void GLTextureUploader::ReleaseHandle(TextureHandle handle)
-{
-    LOG_ASSERT(m_UploadedTextures.contains(handle), "This texture handle doesn't exist");
-
-    GLTextureGPU* texture = m_UploadedTextures[handle].get();
-
-    ClearBindlessHandle(texture);
-    DeleteGLObjects(texture);
-    m_UploadedTextures.erase(handle);
-}
-
-void GLTextureUploader::GenerateGLObjects(GLTextureGPU* texture, TextureDimension dimension)
+void GLTextureUploader::GenerateGLObjects(GLTextureUploadData* texture, TextureDimension dimension)
 {
     const GLenum target = ToGLTarget(dimension);
     glCreateTextures(target, 1, &texture->id);
@@ -47,26 +22,14 @@ void GLTextureUploader::GenerateGLObjects(GLTextureGPU* texture, TextureDimensio
     glCreateSamplers(1, &texture->sampler);
 }
 
-void GLTextureUploader::DeleteGLObjects(GLTextureGPU *texture)
-{
-    glDeleteTextures(1, &texture->id);
-    glDeleteSamplers(1, &texture->sampler);
-}
-
-void GLTextureUploader::UpdateBindlessHandle(GLTextureGPU *texture)
+void GLTextureUploader::UpdateBindlessHandle(GLTextureUploadData *texture)
 {
     const GLuint64 handle = glGetTextureSamplerHandleARB(texture->id, texture->sampler);
     glMakeTextureHandleResidentARB(handle);
     texture->bindlessHandle = handle;
 }
 
-void GLTextureUploader::ClearBindlessHandle(GLTextureGPU *texture)
-{
-    glMakeTextureHandleNonResidentARB(texture->bindlessHandle);
-    texture->bindlessHandle = 0;
-}
-
-void GLTextureUploader::SetTexture(const std::vector<uint8_t> &pixelData, const TextureDesc &textureDesc, GLTextureGPU *texture)
+void GLTextureUploader::SetTexture(const std::vector<uint8_t> &pixelData, const TextureDesc &textureDesc, GLTextureUploadData *texture)
 {
     LOG_ASSERT(!pixelData.empty(), "Pixel data is empty!");
 
@@ -110,6 +73,7 @@ void GLTextureUploader::SetTexture(const std::vector<uint8_t> &pixelData, const 
         case TextureDimension::Cube:
 
         case TextureDimension::CubeArray:
+        {
             const GLsizei layers =
                 (textureDesc.dimension==TextureDimension::Tex2DArray) ? textureDesc.depth :
                 (textureDesc.dimension==TextureDimension::Cube)      ? 6 :
@@ -118,7 +82,8 @@ void GLTextureUploader::SetTexture(const std::vector<uint8_t> &pixelData, const 
             glTextureSubImage3D(texture->id, 0, 0, 0, 0,
                                 textureDesc.width, textureDesc.height, layers,
                                 uploadFmt, uploadType, pixelData.data());
-        break;
+            break;
+        }
 
         case TextureDimension::Tex3D:
             glTextureSubImage3D(texture->id, 0, 0, 0, 0,
@@ -139,7 +104,7 @@ void GLTextureUploader::SetTexture(const std::vector<uint8_t> &pixelData, const 
     glTextureParameteri(texture->id, GL_TEXTURE_MAX_LEVEL,  textureDesc.mipLevels - 1);
 }
 
-void GLTextureUploader::SetSampler(const SamplerDesc &sampler, GLTextureGPU *texture)
+void GLTextureUploader::SetSampler(const SamplerDesc &sampler, GLTextureUploadData *texture)
 {
     const bool hasMips = GLHasMips(texture->id);
 
@@ -161,18 +126,6 @@ void GLTextureUploader::SetSampler(const SamplerDesc &sampler, GLTextureGPU *tex
         }
     }
 
-}
-
-void GLTextureUploader::CleanAllTextures()
-{
-    for (auto& textures : m_UploadedTextures) 
-    {
-        GLTextureGPU* texture = textures.second.get();
-        DeleteGLObjects(texture);
-        ClearBindlessHandle(texture);
-    }
-
-    m_UploadedTextures.clear();
 }
 
 GLenum GLTextureUploader::ToGLInternalFormat(TextureFormat format)

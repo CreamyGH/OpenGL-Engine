@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BaseRenderer.h"
-#include "MeshUploader.h"
 
 class Backend
 {

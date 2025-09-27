@@ -10,13 +10,13 @@ class Texture
 public:
     void SetPixelData(const std::vector<uint8_t>& pixels) { m_Pixels = pixels; }
     void ReleasePixelData() { m_Pixels.clear(); }
-    bool HasPixelData() const { !m_Pixels.empty(); }
+    bool HasPixelData() const { return !m_Pixels.empty(); }
 
     void SetType(const TextureSemantic& semantic) { m_Semantic = semantic; }
 
     void SetDescription(const TextureDesc& dataDesc) { m_DataDesc = dataDesc; }
     void SetSamplerDesc(const SamplerDesc& samplerDesc) { m_SamplerDesc = samplerDesc; }
-    void SetDescription(const TextureViewDesc& viewDesc) { m_ViewDesc = viewDesc; }
+    void SetViewDescription(const TextureViewDesc& viewDesc) { m_ViewDesc = viewDesc; }
 
     const TextureDesc& GetDescription() const { return m_DataDesc; }
     const SamplerDesc& GetSamplerDesc() const { return m_SamplerDesc; }

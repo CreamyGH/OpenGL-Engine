@@ -18,6 +18,13 @@ struct GLMeshGPU : public MeshGPU
         glBindVertexArray(0);
     }
 
+    ~GLMeshGPU() override
+    {
+        glDeleteBuffers(1, &vbo);
+        glDeleteBuffers(1, &ebo);
+        glDeleteVertexArrays(1, &vao);
+    }
+
     GLuint vbo = 0;
     GLuint ebo = 0;
     GLuint vao = 0;

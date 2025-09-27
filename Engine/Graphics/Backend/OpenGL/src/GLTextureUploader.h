@@ -6,27 +6,22 @@
 #include "Log.h"
 
 #include "TextureUploader.h"
-#include "GLTextureGPU.h"
+#include "GLTextureUploadData.h"
 
 class GLTextureUploader : public TextureUploader
 {
 public:
-    virtual TextureHandle CreateTextureHandle(const std::vector<uint8_t>& pixelData, const TextureDesc& desc, const SamplerDesc& sampler, const TextureViewDesc& view) override;
-    virtual void UpdateTextureHandle(TextureHandle oldHandle, const std::vector<uint8_t>& pixelData, const TextureDesc& desc, const SamplerDesc& sampler, const TextureViewDesc& view) override;
-
-    void ReleaseHandle(TextureHandle handle) override;
-    const GLTextureGPU* GetTextureGPU(TextureHandle handle) override { return m_UploadedTextures[handle].get(); }
-    void CleanAllTextures() override;
+    std::unique_ptr<TextureUploadData> UploadTexture(const std::vector<uint8_t>& pixelData, 
+        const TextureDesc& desc,
+        const SamplerDesc& sampler) override;
 
 private:
-    void GenerateGLObjects(GLTextureGPU* texture, TextureDimension dimension);
-    void DeleteGLObjects(GLTextureGPU* texture);
+    void GenerateGLObjects(GLTextureUploadData* texture, TextureDimension dimension);
 
-    void SetTexture(const std::vector<uint8_t>& pixelData, const TextureDesc& textureDesc, GLTextureGPU* texture);
-    void SetSampler(const SamplerDesc& sampler, GLTextureGPU* texture);
+    void SetTexture(const std::vector<uint8_t>& pixelData, const TextureDesc& textureDesc, GLTextureUploadData* texture);
+    void SetSampler(const SamplerDesc& sampler, GLTextureUploadData* texture);
 
-    void UpdateBindlessHandle(GLTextureGPU* texture);
-    void ClearBindlessHandle(GLTextureGPU* texture);
+    void UpdateBindlessHandle(GLTextureUploadData* texture);
 
     //Helpers
     GLenum ToGLInternalFormat(TextureFormat format);
@@ -40,8 +35,4 @@ private:
     GLenum ToGLWrap(Address adress);
 
     bool GLHasMips(GLuint tex);
-
-private:
-    std::unordered_map<TextureHandle, std::unique_ptr<GLTextureGPU>> m_UploadedTextures;
-    TextureHandle m_NextHandle = 1;
 };
